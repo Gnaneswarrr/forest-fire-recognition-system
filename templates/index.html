@@ -1,0 +1,152 @@
+{% extends "base.html" %}
+{% block title %}Forest Fire Recognition — ML-Powered Fire & Smoke Detection{% endblock %}
+
+{% block content %}
+<!-- ═══ Hero ═══════════════════════════════════════════════════ -->
+<section class="eco-hero d-flex align-items-center">
+    <div class="eco-hero-overlay"></div>
+    <div class="container position-relative z-1 text-center">
+        <h1 class="eco-hero-title" data-aos="zoom-in">
+            <i class="fa-solid fa-tree"></i>
+            Forest Fire Recognition
+        </h1>
+        <p class="eco-hero-sub" data-aos="fade-up" data-aos-delay="200">
+            Protecting forests, wildlife &amp; ecosystems &mdash; AI-powered early fire &amp; smoke recognition to safeguard our natural heritage.
+        </p>
+        <div class="mt-4" data-aos="fade-up" data-aos-delay="400">
+            <a href="{{ url_for('upload_page') }}" class="btn btn-flame btn-lg me-2">
+                <i class="fa-solid fa-fire"></i> Detect Fire Now
+            </a>
+            <a href="{{ url_for('about') }}" class="btn btn-outline-leaf btn-lg">
+                <i class="fa-solid fa-leaf"></i> Learn More
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- ═══ Features ═══════════════════════════════════════════════ -->
+<section class="py-5" id="features">
+    <div class="container">
+        <h2 class="section-heading text-center mb-5" data-aos="fade-up">
+            <i class="fa-solid fa-cubes-stacked"></i> Key Features
+        </h2>
+        <div class="row g-4">
+            {% set features = [
+                ("fa-tree", "Forest Image Analysis", "Upload aerial, drone or ground-level forest images — instantly identify fire, smoke, or safe canopy."),
+                ("fa-video", "Live Forest Monitoring", "Mount a webcam facing the forest canopy for real-time fire & smoke surveillance."),
+                ("fa-brain", "Deep Learning CNN", "InceptionV3 trained on 32,000+ forest fire images recognizes flames, smoke plumes & healthy woodland."),
+                ("fa-gauge-high", "Forest Risk Assessment", "Automatic threat grading — Safe, Moderate, High, or Critical — with evacuation & ranger response advice."),
+                ("fa-map-location-dot", "GPS & Forest Mapping", "Geolocate fire incidents on interactive maps to pinpoint exact forest zones at risk."),
+                ("fa-bell", "Fire Alarm & Alerts", "Audible siren alarm triggers instantly when fire or smoke is recognized in a forest area.")
+            ] %}
+            {% for icon, title, desc in features %}
+            <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="{{ loop.index0 * 100 }}">
+                <div class="eco-feature-card h-100">
+                    <div class="eco-feature-icon"><i class="fa-solid {{ icon }}"></i></div>
+                    <h5>{{ title }}</h5>
+                    <p>{{ desc }}</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- ═══ How It Works ══════════════════════════════════════════ -->
+<section class="eco-section-alt py-5">
+    <div class="container">
+        <h2 class="section-heading text-center mb-5" data-aos="fade-up">
+            <i class="fa-solid fa-diagram-project"></i> How It Works
+        </h2>
+        <div class="row text-center g-4">
+            {% set steps = [
+                ("1", "fa-cloud-arrow-up", "Capture Forest Scene", "Upload a forest photograph, satellite image, or use a live camera feed from the field."),
+                ("2", "fa-gears", "Image Preprocessing", "The forest image is resized, denoised, and normalised for optimal analysis."),
+                ("3", "fa-microchip", "Fire Recognition", "Our CNN model recognizes if the forest scene contains Fire, Smoke, or is Safe."),
+                ("4", "fa-file-lines", "Forest Safety Report", "Get a detailed forest risk report with threat level, GPS location, and ranger action advice.")
+            ] %}
+            {% for num, icon, title, desc in steps %}
+            <div class="col-md-6 col-lg-3" data-aos="fade-up" data-aos-delay="{{ loop.index0 * 150 }}">
+                <div class="eco-step-card">
+                    <span class="eco-step-num">{{ num }}</span>
+                    <i class="fa-solid {{ icon }} eco-step-icon"></i>
+                    <h6>{{ title }}</h6>
+                    <small>{{ desc }}</small>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- ═══ Live Stats Counter ════════════════════════════════════ -->
+<section class="py-5">
+    <div class="container">
+        <div class="row text-center g-4" id="statsRow">
+            <div class="col-6 col-md-3" data-aos="zoom-in">
+                <div class="eco-counter-card">
+                    <i class="fa-solid fa-image fa-2x mb-2 text-leaf"></i>
+                    <h3 class="counter" data-target="0" id="statTotal">0</h3>
+                    <small>Forest Scans</small>
+                </div>
+            </div>
+            <div class="col-6 col-md-3" data-aos="zoom-in" data-aos-delay="100">
+                <div class="eco-counter-card">
+                    <i class="fa-solid fa-fire fa-2x mb-2 text-flame"></i>
+                    <h3 id="statFires">0</h3>
+                    <small>Forest Fires Found</small>
+                </div>
+            </div>
+            <div class="col-6 col-md-3" data-aos="zoom-in" data-aos-delay="200">
+                <div class="eco-counter-card">
+                    <i class="fa-solid fa-tree fa-2x mb-2 text-leaf"></i>
+                    <h3 id="statSafe">0</h3>
+                    <small>Forests Safe</small>
+                </div>
+            </div>
+            <div class="col-6 col-md-3" data-aos="zoom-in" data-aos-delay="300">
+                <div class="eco-counter-card">
+                    <i class="fa-solid fa-percent fa-2x mb-2 text-amber"></i>
+                    <h3 id="statAcc">0%</h3>
+                    <small>Recognition Accuracy</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ═══ Tech Stack ════════════════════════════════════════════ -->
+<section class="eco-section-alt py-5">
+    <div class="container text-center">
+        <h2 class="section-heading mb-4" data-aos="fade-up"><i class="fa-solid fa-layer-group"></i> Technology Stack</h2>
+        <div class="d-flex flex-wrap justify-content-center gap-3" data-aos="fade-up" data-aos-delay="100">
+            {% for tech in ["Python", "Flask", "TensorFlow", "Keras", "OpenCV", "NumPy", "Scikit-learn", "Bootstrap 5", "Chart.js", "JavaScript"] %}
+            <span class="badge eco-tech-badge">{{ tech }}</span>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- ═══ CTA ═══════════════════════════════════════════════════ -->
+<section class="py-5 text-center">
+    <div class="container" data-aos="fade-up">
+        <h2 class="mb-3"><i class="fa-solid fa-tree"></i> Ready to Protect Our Forests?</h2>
+        <p class="text-muted mb-4">Upload a forest image, drone photo, or satellite view — our AI will recognize fire &amp; smoke threats instantly.</p>
+        <a href="{{ url_for('upload_page') }}" class="btn btn-flame btn-lg">
+            <i class="fa-solid fa-arrow-up-from-bracket"></i> Start Detection
+        </a>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Fetch live stats and animate counters
+fetch('/api/stats').then(r=>r.json()).then(d=>{
+    animateCountUp(document.getElementById('statTotal'), d.total);
+    animateCountUp(document.getElementById('statFires'), d.fires + d.smoke);
+    animateCountUp(document.getElementById('statSafe'), d.safe);
+    animateCountUp(document.getElementById('statAcc'), d.accuracy.overall, '%');
+}).catch(()=>{});
+</script>
+{% endblock %}

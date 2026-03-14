@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+{% block title %}Dataset — Forest Fire Recognition{% endblock %}
+
+{% block content %}
+<section class="eco-page-header">
+    <div class="container text-center">
+        <h1 data-aos="fade-down"><i class="fa-solid fa-database"></i> Dataset Information</h1>
+        <p class="text-muted" data-aos="fade-up">Real-world forest fire, smoke &amp; woodland images used to train our recognition model</p>
+    </div>
+</section>
+
+<section class="py-5">
+    <div class="container">
+        <!-- Overview cards -->
+        <div class="row g-4 mb-5">
+            <div class="col-md-3" data-aos="fade-up">
+                <div class="eco-stat-card text-center">
+                    <i class="fa-solid fa-images fa-2x text-amber mb-3"></i>
+                    <h3>42,900</h3>
+                    <p>Total Forest Images</p>
+                </div>
+            </div>
+            <div class="col-md-3" data-aos="fade-up" data-aos-delay="100">
+                <div class="eco-stat-card text-center">
+                    <i class="fa-solid fa-fire fa-2x text-flame mb-3"></i>
+                    <h3>14,300</h3>
+                    <p>Forest Fire Images</p>
+                </div>
+            </div>
+            <div class="col-md-3" data-aos="fade-up" data-aos-delay="150">
+                <div class="eco-stat-card text-center">
+                    <i class="fa-solid fa-smog fa-2x text-amber mb-3"></i>
+                    <h3>14,300</h3>
+                    <p>Forest Smoke Images</p>
+                </div>
+            </div>
+            <div class="col-md-3" data-aos="fade-up" data-aos-delay="200">
+                <div class="eco-stat-card text-center">
+                    <i class="fa-solid fa-tree fa-2x text-leaf mb-3"></i>
+                    <h3>14,300</h3>
+                    <p>Healthy Forest Images</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts row -->
+        <div class="row g-4 mb-5">
+            <div class="col-md-6" data-aos="fade-right">
+                <div class="eco-chart-card">
+                    <h5 class="mb-3"><i class="fa-solid fa-chart-pie"></i> Class Distribution</h5>
+                    <canvas id="distChart" height="260"></canvas>
+                </div>
+            </div>
+            <div class="col-md-6" data-aos="fade-left">
+                <div class="eco-chart-card">
+                    <h5 class="mb-3"><i class="fa-solid fa-chart-bar"></i> Model Accuracy Comparison</h5>
+                    <canvas id="accChart" height="260"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Preprocessing pipeline -->
+        <h3 class="section-heading text-center mb-4" data-aos="fade-up">
+            <i class="fa-solid fa-wand-magic-sparkles"></i> Preprocessing Pipeline
+        </h3>
+        <div class="row g-4 mb-5">
+            {% set pipes = [
+                ("fa-expand", "Resize", "All images resized to 224 × 224 pixels to match InceptionV3 input requirements."),
+                ("fa-eraser", "Denoise", "Non-local means denoising removes sensor noise while preserving edges."),
+                ("fa-sliders", "Normalize", "Pixel values scaled to [0, 1] for stable gradient descent training."),
+                ("fa-clone", "Augmentation", "Random flips, rotations, and brightness jitter expand training variety.")
+            ] %}
+            {% for icon, title, desc in pipes %}
+            <div class="col-md-3" data-aos="fade-up" data-aos-delay="{{ loop.index0 * 100 }}">
+                <div class="eco-step-card text-center">
+                    <i class="fa-solid {{ icon }} fa-2x text-amber mb-2"></i>
+                    <h6>{{ title }}</h6>
+                    <small>{{ desc }}</small>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Sample images note -->
+        <div class="eco-info-card border-leaf text-center" data-aos="fade-up">
+            <h5><i class="fa-solid fa-folder-open"></i> Dataset Structure</h5>
+            <pre class="text-start d-inline-block mt-3 text-muted" style="font-size:.85rem">
+dataset/
+├── fire/          ← Forest scenes with active fires or flames
+│   ├── fire_001.jpg
+│   ├── fire_002.jpg
+│   └── ...
+├── smoke/         ← Forest areas with visible smoke plumes
+│   ├── smoke_001.jpg
+│   ├── smoke_002.jpg
+│   └── ...
+└── non_fire/      ← Healthy forest canopy, woodland &amp; natural scenes
+    ├── forest_001.jpg
+    ├── forest_002.jpg
+    └── ...
+            </pre>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Distribution doughnut
+new Chart(document.getElementById('distChart'), {
+    type:'doughnut',
+    data:{
+        labels:['Forest Fire','Forest Smoke','Healthy Forest'],
+        datasets:[{data:[14300,14300,14300],
+            backgroundColor:['#FF6F00','#FFC107','#2E7D32'],
+            borderWidth:0}]
+    },
+    options:{responsive:true, plugins:{legend:{position:'bottom',labels:{color:'#ccc'}}}}
+});
+// Accuracy bar
+new Chart(document.getElementById('accChart'), {
+    type:'bar',
+    data:{
+        labels:['Fire (96%)','Smoke (74%)','Non-Fire (90%)','Overall (86.7%)'],
+        datasets:[{label:'Recognition Accuracy %',
+            data:[96,74,90,86.7],
+            backgroundColor:['#FF6F00','#FFC107','#2E7D32','#4CAF50'],
+            borderRadius:6}]
+    },
+    options:{responsive:true,
+        scales:{y:{beginAtZero:true,max:100,ticks:{color:'#aaa'},grid:{color:'#333'}},
+                x:{ticks:{color:'#aaa'},grid:{display:false}}},
+        plugins:{legend:{display:false}}}
+});
+</script>
+{% endblock %}

@@ -1,0 +1,278 @@
+[
+  {
+    "id": "0a7a8db1073f",
+    "timestamp": "2026-03-12 12:53:56",
+    "filename": "download.jpg",
+    "image": "0655a4f896d14e2aba001e0fd9ec6026.jpg",
+    "source": "upload",
+    "location": {
+      "lat": 22.288516,
+      "lng": 73.3636479,
+      "address": "Parents Parking (bba parcel delivery), SH158, Waghodia, Vagodhia Taluka, Vadodara, Gujarat, 391760, India"
+    },
+    "label": "FIRE DETECTED",
+    "detailed_label": "Fire",
+    "confidence": 96.26,
+    "risk_level": "Critical",
+    "risk_color": "#D32F2F",
+    "probabilities": {
+      "fire": 96.26,
+      "no_fire": 0.11,
+      "smoke": 3.63
+    },
+    "recommendation": "CRITICAL: Immediate evacuation required. Contact emergency services (911) now."
+  },
+  {
+    "id": "6c52d56b8e68",
+    "timestamp": "2026-03-12 12:52:31",
+    "filename": "download.jpg",
+    "image": "371ff3b6fd0140a68940ed19558922e3.jpg",
+    "source": "upload",
+    "location": {
+      "lat": 22.288876,
+      "lng": 73.36365,
+      "address": "Parul University, SH158, Waghodia, Vagodhia Taluka, Vadodara, Gujarat, 391760, India"
+    },
+    "label": "FIRE DETECTED",
+    "detailed_label": "Fire",
+    "confidence": 96.26,
+    "risk_level": "Critical",
+    "risk_color": "#D32F2F",
+    "probabilities": {
+      "fire": 96.26,
+      "no_fire": 0.11,
+      "smoke": 3.63
+    },
+    "recommendation": "CRITICAL: Immediate evacuation required. Contact emergency services (911) now."
+  },
+  {
+    "id": "2b7df8573a05",
+    "timestamp": "2026-03-12 12:52:30",
+    "filename": "519196_gettyimages1270593514_590256.jpg",
+    "image": "4119febf9c1747a98f48031776254487.jpg",
+    "source": "upload",
+    "location": {
+      "lat": 22.288876,
+      "lng": 73.36365,
+      "address": "Parul University, SH158, Waghodia, Vagodhia Taluka, Vadodara, Gujarat, 391760, India"
+    },
+    "label": "FIRE DETECTED",
+    "detailed_label": "Fire",
+    "confidence": 99.01,
+    "risk_level": "Critical",
+    "risk_color": "#D32F2F",
+    "probabilities": {
+      "fire": 99.01,
+      "no_fire": 0.0,
+      "smoke": 0.99
+    },
+    "recommendation": "CRITICAL: Immediate evacuation required. Contact emergency services (911) now."
+  },
+  {
+    "id": "9048e08e1516",
+    "timestamp": "2026-03-11 15:56:03",
+    "filename": "download_1.jpg",
+    "image": "bf00bf3473604634bf0c3c108f01cb44.jpg",
+    "source": "upload",
+    "location": {
+      "lat": 22.292402621237933,
+      "lng": 73.36320022146508,
+      "address": "Vns HOSTEL, Vagodhia Taluka, Vadodara, Gujarat, 391760, India"
+    },
+    "label": "FIRE DETECTED",
+    "detailed_label": "Fire",
+    "confidence": 98.74,
+    "risk_level": "Critical",
+    "risk_color": "#D32F2F",
+    "probabilities": {
+      "fire": 98.74,
+      "no_fire": 0.08,
+      "smoke": 1.17
+    },
+    "recommendation": "CRITICAL: Immediate evacuation required. Contact emergency services (911) now."
+  },
+  {
+    "id": "3ac1c840e67f",
+    "timestamp": "2026-03-11 15:55:23",
+    "filename": "download.jpg",
+    "image": "cfaece72640740bfa3e02be71d040d80.jpg",
+    "source": "upload",
+    "location": {
+      "lat": 22.2923385,
+      "lng": 73.36321249999999,
+      "address": "Vns HOSTEL, Vagodhia Taluka, Vadodara, Gujarat, 391760, India"
+    },
+    "label": "FIRE DETECTED",
+    "detailed_label": "Fire",
+    "confidence": 96.26,
+    "risk_level": "Critical",
+    "risk_color": "#D32F2F",
+    "probabilities": {
+      "fire": 96.26,
+      "no_fire": 0.11,
+      "smoke": 3.63
+    },
+    "recommendation": "CRITICAL: Immediate evacuation required. Contact emergency services (911) now."
+  },
+  {
+    "id": "3df4d480bb04",
+    "timestamp": "2026-03-11 15:55:23",
+    "filename": "download.jpg",
+    "image": "d2589cf0ce95424aa05915a4238017c7.jpg",
+    "source": "upload",
+    "location": {
+      "lat": 22.292402621237933,
+      "lng": 73.36320022146508,
+      "address": "Vns HOSTEL, Vagodhia Taluka, Vadodara, Gujarat, 391760, India"
+    },
+    "label": "FIRE DETECTED",
+    "detailed_label": "Fire",
+    "confidence": 96.26,
+    "risk_level": "Critical",
+    "risk_color": "#D32F2F",
+    "probabilities": {
+      "fire": 96.26,
+      "no_fire": 0.11,
+      "smoke": 3.63
+    },
+    "recommendation": "CRITICAL: Immediate evacuation required. Contact emergency services (911) now."
+  },
+  {
+    "id": "2f1b0a5da10f",
+    "timestamp": "2026-03-10 23:04:14",
+    "filename": "download.jpg",
+    "image": "a5fe185993cd464a872b3692cd862fc7.jpg",
+    "source": "upload",
+    "location": {
+      "lat": 22.292124,
+      "lng": 73.36322,
+      "address": "Vns HOSTEL, Vagodhia Taluka, Vadodara, Gujarat, 391760, India"
+    },
+    "label": "FIRE DETECTED",
+    "detailed_label": "Fire",
+    "confidence": 96.26,
+    "risk_level": "Critical",
+    "risk_color": "#D32F2F",
+    "probabilities": {
+      "fire": 96.26,
+      "no_fire": 0.11,
+      "smoke": 3.63
+    },
+    "recommendation": "CRITICAL: Immediate evacuation required. Contact emergency services (911) now."
+  },
+  {
+    "id": "f744a99a9408",
+    "timestamp": "2026-03-10 22:46:28",
+    "filename": "download.jpg",
+    "image": "3eeda01a43114b0e987d93ed2b0038fc.jpg",
+    "source": "upload",
+    "location": {
+      "lat": 22.292124,
+      "lng": 73.36322,
+      "address": "Vns HOSTEL, Vagodhia Taluka, Vadodara, Gujarat, 391760, India"
+    },
+    "label": "FIRE DETECTED",
+    "detailed_label": "Fire",
+    "confidence": 96.26,
+    "risk_level": "Critical",
+    "risk_color": "#D32F2F",
+    "probabilities": {
+      "fire": 96.26,
+      "no_fire": 0.11,
+      "smoke": 3.63
+    },
+    "recommendation": "CRITICAL: Immediate evacuation required. Contact emergency services (911) now."
+  },
+  {
+    "id": "d422eaa68247",
+    "timestamp": "2026-03-10 22:30:18",
+    "filename": "download.jpg",
+    "image": "561bb845eab147c19a01e5f2e6698c3b.jpg",
+    "source": "upload",
+    "location": {
+      "lat": 22.292124,
+      "lng": 73.36322,
+      "address": "Vns HOSTEL, Vagodhia Taluka, Vadodara, Gujarat, 391760, India"
+    },
+    "label": "FIRE DETECTED",
+    "detailed_label": "Fire",
+    "confidence": 96.26,
+    "risk_level": "Critical",
+    "risk_color": "#D32F2F",
+    "probabilities": {
+      "fire": 96.26,
+      "no_fire": 0.11,
+      "smoke": 3.63
+    },
+    "recommendation": "CRITICAL: Immediate evacuation required. Contact emergency services (911) now."
+  },
+  {
+    "id": "b0558fe77c12",
+    "timestamp": "2026-03-10 22:22:42",
+    "filename": "download.jpg",
+    "image": "4b008ef4be7742c8ace4f0b8aca51494.jpg",
+    "source": "upload",
+    "location": {
+      "lat": 22.292124,
+      "lng": 73.36322,
+      "address": "Vns HOSTEL, Vagodhia Taluka, Vadodara, Gujarat, 391760, India"
+    },
+    "label": "FIRE DETECTED",
+    "detailed_label": "Fire",
+    "confidence": 96.26,
+    "risk_level": "Critical",
+    "risk_color": "#D32F2F",
+    "probabilities": {
+      "fire": 96.26,
+      "no_fire": 0.11,
+      "smoke": 3.63
+    },
+    "recommendation": "CRITICAL: Immediate evacuation required. Contact emergency services (911) now."
+  },
+  {
+    "id": "906a658336e8",
+    "timestamp": "2026-03-10 22:01:50",
+    "filename": "download.jpg",
+    "image": "5ebd2cfae8de4a98b7d3c09094e1b9d1.jpg",
+    "source": "upload",
+    "location": {
+      "lat": 22.292402621237933,
+      "lng": 73.36320022146508,
+      "address": "Vns HOSTEL, Vagodhia Taluka, Vadodara, Gujarat, 391760, India"
+    },
+    "label": "FIRE DETECTED",
+    "detailed_label": "Fire",
+    "confidence": 96.26,
+    "risk_level": "Critical",
+    "risk_color": "#D32F2F",
+    "probabilities": {
+      "fire": 96.26,
+      "no_fire": 0.11,
+      "smoke": 3.63
+    },
+    "recommendation": "CRITICAL: Immediate evacuation required. Contact emergency services (911) now."
+  },
+  {
+    "id": "855250ef74e8",
+    "timestamp": "2026-03-10 21:53:36",
+    "filename": "download.jpg",
+    "image": "e6686f1e5c794fb49ce3e3bb005afb09.jpg",
+    "source": "upload",
+    "location": {
+      "lat": 22.292124,
+      "lng": 73.36322,
+      "address": "Vns HOSTEL, Vagodhia Taluka, Vadodara, Gujarat, 391760, India"
+    },
+    "label": "FIRE DETECTED",
+    "detailed_label": "Fire",
+    "confidence": 96.26,
+    "risk_level": "Critical",
+    "risk_color": "#D32F2F",
+    "probabilities": {
+      "fire": 96.26,
+      "no_fire": 0.11,
+      "smoke": 3.63
+    },
+    "recommendation": "CRITICAL: Immediate evacuation required. Contact emergency services (911) now."
+  }
+]

@@ -1,0 +1,302 @@
+{% extends "base.html" %}
+{% block title %}Weather & Fire Risk — Forest Fire Recognition{% endblock %}
+{% block content %}
+<section class="eco-section">
+  <div class="container">
+    <h2 class="text-center mb-2" data-aos="fade-down">
+      <i class="fa-solid fa-cloud-sun-rain"></i> Weather &amp; Fire Risk Index
+    </h2>
+    <p class="text-center text-muted mb-4" data-aos="fade-up">
+      Real-time weather conditions and calculated fire danger level for any location
+    </p>
+
+    <!-- Location Input -->
+    <div class="row justify-content-center mb-4" data-aos="fade-up">
+      <div class="col-md-8 col-lg-6">
+        <div class="eco-card p-4">
+          <div class="input-group">
+            <input type="text" id="wxCity" class="form-control eco-select"
+                   placeholder="Enter city name (e.g. Mumbai, Los Angeles)" value="New Delhi">
+            <button class="btn btn-success" id="wxSearchBtn">
+              <i class="fa-solid fa-magnifying-glass"></i> Search
+            </button>
+          </div>
+          <div class="text-center mt-3">
+            <button class="btn btn-outline-success btn-sm" id="wxGpsBtn">
+              <i class="fa-solid fa-location-crosshairs"></i> Use My Location
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Loading -->
+    <div class="text-center d-none" id="wxLoading">
+      <div class="spinner-border text-success mb-2" role="status"></div>
+      <p class="text-muted">Fetching weather data…</p>
+    </div>
+
+    <!-- Error -->
+    <div class="alert alert-danger d-none text-center" id="wxError"></div>
+
+    <!-- Results Container -->
+    <div class="d-none" id="wxResults">
+      <!-- Current Weather Row -->
+      <div class="row g-3 mb-4" data-aos="fade-up">
+        <div class="col-md-4">
+          <div class="eco-card p-3 text-center h-100">
+            <i class="fa-solid fa-temperature-half fa-2x text-warning mb-2"></i>
+            <h5 id="wxTemp">--</h5>
+            <small class="text-muted">Temperature</small>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="eco-card p-3 text-center h-100">
+            <i class="fa-solid fa-droplet fa-2x text-info mb-2"></i>
+            <h5 id="wxHumidity">--</h5>
+            <small class="text-muted">Humidity</small>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="eco-card p-3 text-center h-100">
+            <i class="fa-solid fa-wind fa-2x text-secondary mb-2"></i>
+            <h5 id="wxWind">--</h5>
+            <small class="text-muted">Wind Speed</small>
+          </div>
+        </div>
+      </div>
+
+      <div class="row g-3 mb-4" data-aos="fade-up" data-aos-delay="100">
+        <div class="col-md-3">
+          <div class="eco-card p-3 text-center h-100">
+            <i class="fa-solid fa-eye fa-2x text-muted mb-2"></i>
+            <h6 id="wxVisibility">--</h6>
+            <small class="text-muted">Visibility</small>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="eco-card p-3 text-center h-100">
+            <i class="fa-solid fa-cloud fa-2x text-muted mb-2"></i>
+            <h6 id="wxClouds">--</h6>
+            <small class="text-muted">Cloud Cover</small>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="eco-card p-3 text-center h-100">
+            <i class="fa-solid fa-gauge fa-2x text-muted mb-2"></i>
+            <h6 id="wxPressure">--</h6>
+            <small class="text-muted">Pressure</small>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="eco-card p-3 text-center h-100">
+            <i class="fa-solid fa-sun fa-2x text-warning mb-2"></i>
+            <h6 id="wxCondition">--</h6>
+            <small class="text-muted">Condition</small>
+          </div>
+        </div>
+      </div>
+
+      <!-- Fire Risk Index -->
+      <div class="row justify-content-center mb-4" data-aos="fade-up" data-aos-delay="200">
+        <div class="col-md-8">
+          <div class="eco-card p-4">
+            <h4 class="text-center mb-3">
+              <i class="fa-solid fa-fire-flame-curved"></i> Fire Weather Index (FWI)
+            </h4>
+            <div class="text-center mb-3">
+              <span class="wx-fwi-badge" id="wxFwiBadge">--</span>
+            </div>
+            <div class="text-center mb-3">
+              <h5 id="wxFwiLabel" class="mb-1">Calculating…</h5>
+              <small class="text-muted" id="wxFwiDesc">—</small>
+            </div>
+            <!-- FWI Gauge -->
+            <div class="wx-gauge-container">
+              <div class="wx-gauge-track">
+                <div class="wx-gauge-fill" id="wxGaugeFill" style="width:0%"></div>
+              </div>
+              <div class="d-flex justify-content-between mt-1">
+                <small class="text-success">Low</small>
+                <small class="text-warning">Moderate</small>
+                <small class="text-orange">High</small>
+                <small class="text-danger">Very High</small>
+                <small style="color:#8b0000">Extreme</small>
+              </div>
+            </div>
+            <!-- Factors -->
+            <div class="row g-2 mt-3" id="wxFactors">
+              <div class="col-6 col-md-3">
+                <div class="wx-factor-chip">
+                  <small class="text-muted">Temp Factor</small>
+                  <span id="wxFactorTemp">--</span>
+                </div>
+              </div>
+              <div class="col-6 col-md-3">
+                <div class="wx-factor-chip">
+                  <small class="text-muted">Humidity Factor</small>
+                  <span id="wxFactorHum">--</span>
+                </div>
+              </div>
+              <div class="col-6 col-md-3">
+                <div class="wx-factor-chip">
+                  <small class="text-muted">Wind Factor</small>
+                  <span id="wxFactorWind">--</span>
+                </div>
+              </div>
+              <div class="col-6 col-md-3">
+                <div class="wx-factor-chip">
+                  <small class="text-muted">Rain Factor</small>
+                  <span id="wxFactorRain">--</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recommendation -->
+      <div class="row justify-content-center mb-4" data-aos="fade-up" data-aos-delay="250">
+        <div class="col-md-8">
+          <div class="eco-card p-3" id="wxRecommendation">
+            <h6><i class="fa-solid fa-shield-halved"></i> Recommendation</h6>
+            <p class="mb-0" id="wxRecText">—</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Location Info -->
+      <div class="row justify-content-center" data-aos="fade-up" data-aos-delay="300">
+        <div class="col-md-8">
+          <div class="eco-card p-3 text-center">
+            <small class="text-muted">
+              <i class="fa-solid fa-map-marker-alt"></i>
+              <span id="wxLocationName">—</span> &bull;
+              Updated: <span id="wxUpdated">—</span>
+            </small>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- How It Works -->
+    <div class="row justify-content-center mt-5" data-aos="fade-up" data-aos-delay="350">
+      <div class="col-md-10">
+        <div class="eco-card p-4">
+          <h5><i class="fa-solid fa-circle-question"></i> How Fire Weather Index Works</h5>
+          <p class="text-muted small mb-2">
+            The FWI combines four weather factors to estimate forest fire danger:
+          </p>
+          <ul class="text-muted small mb-0">
+            <li><strong>Temperature:</strong> Higher temperatures dry out vegetation, increasing fire risk</li>
+            <li><strong>Humidity:</strong> Low humidity means drier air and fuel, raising fire probability</li>
+            <li><strong>Wind Speed:</strong> Strong winds spread fires faster and supply oxygen</li>
+            <li><strong>Precipitation:</strong> Recent rain reduces fire risk by moistening fuels</li>
+          </ul>
+          <div class="mt-2">
+            <span class="badge bg-success me-1">0–20 Low</span>
+            <span class="badge bg-warning text-dark me-1">21–40 Moderate</span>
+            <span class="badge" style="background:#e67e22;color:#fff">41–60 High</span>
+            <span class="badge bg-danger me-1">61–80 Very High</span>
+            <span class="badge" style="background:#8b0000;color:#fff">81–100 Extreme</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function(){
+  const $ = s => document.querySelector(s);
+
+  function fetchWeather(query) {
+    $('#wxLoading').classList.remove('d-none');
+    $('#wxResults').classList.add('d-none');
+    $('#wxError').classList.add('d-none');
+
+    fetch('/api/weather?' + query)
+      .then(r => r.json())
+      .then(d => {
+        $('#wxLoading').classList.add('d-none');
+        if (d.error) {
+          $('#wxError').textContent = d.error;
+          $('#wxError').classList.remove('d-none');
+          return;
+        }
+        renderWeather(d);
+        $('#wxResults').classList.remove('d-none');
+      })
+      .catch(e => {
+        $('#wxLoading').classList.add('d-none');
+        $('#wxError').textContent = 'Failed to fetch weather data';
+        $('#wxError').classList.remove('d-none');
+      });
+  }
+
+  function renderWeather(d) {
+    const w = d.weather;
+    $('#wxTemp').textContent = w.temp_c.toFixed(1) + '°C';
+    $('#wxHumidity').textContent = w.humidity + '%';
+    $('#wxWind').textContent = w.wind_kmh.toFixed(1) + ' km/h';
+    $('#wxVisibility').textContent = (w.visibility_m / 1000).toFixed(1) + ' km';
+    $('#wxClouds').textContent = w.clouds + '%';
+    $('#wxPressure').textContent = w.pressure + ' hPa';
+    $('#wxCondition').textContent = w.description;
+    $('#wxLocationName').textContent = d.location;
+    $('#wxUpdated').textContent = d.updated;
+
+    // FWI
+    const fwi = d.fwi;
+    $('#wxFwiBadge').textContent = fwi.score;
+    $('#wxFwiBadge').className = 'wx-fwi-badge wx-fwi-' + fwi.level.toLowerCase().replace(/\s+/g, '-');
+    $('#wxFwiLabel').textContent = fwi.level + ' Fire Danger';
+    $('#wxFwiDesc').textContent = fwi.description;
+    $('#wxGaugeFill').style.width = fwi.score + '%';
+
+    // Color the gauge fill
+    const colors = {'low':'#28a745','moderate':'#ffc107','high':'#e67e22','very-high':'#dc3545','extreme':'#8b0000'};
+    const lvl = fwi.level.toLowerCase().replace(/\s+/g, '-');
+    $('#wxGaugeFill').style.background = colors[lvl] || '#28a745';
+
+    // Factors
+    $('#wxFactorTemp').textContent = fwi.factors.temperature.toFixed(0);
+    $('#wxFactorHum').textContent = fwi.factors.humidity.toFixed(0);
+    $('#wxFactorWind').textContent = fwi.factors.wind.toFixed(0);
+    $('#wxFactorRain').textContent = fwi.factors.precipitation.toFixed(0);
+
+    // Recommendation
+    $('#wxRecText').textContent = fwi.recommendation;
+  }
+
+  // Search button
+  $('#wxSearchBtn').addEventListener('click', () => {
+    const city = $('#wxCity').value.trim();
+    if (city) fetchWeather('city=' + encodeURIComponent(city));
+  });
+
+  // Enter key
+  $('#wxCity').addEventListener('keydown', e => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      const city = $('#wxCity').value.trim();
+      if (city) fetchWeather('city=' + encodeURIComponent(city));
+    }
+  });
+
+  // GPS button
+  $('#wxGpsBtn').addEventListener('click', () => {
+    if (!navigator.geolocation) return alert('Geolocation not supported');
+    navigator.geolocation.getCurrentPosition(
+      pos => fetchWeather('lat=' + pos.coords.latitude + '&lon=' + pos.coords.longitude),
+      () => alert('Location access denied')
+    );
+  });
+
+  // Auto-load default city
+  fetchWeather('city=New+Delhi');
+})();
+</script>
+{% endblock %}

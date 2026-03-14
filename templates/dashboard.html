@@ -1,0 +1,261 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — Forest Fire Recognition{% endblock %}
+
+{% block content %}
+<section class="eco-page-header">
+    <div class="container text-center">
+        <h1 data-aos="fade-down"><i class="fa-solid fa-chart-line"></i> Admin Dashboard</h1>
+        <p class="text-muted" data-aos="fade-up">Detection analytics & model performance overview</p>
+    </div>
+</section>
+
+<section class="py-5">
+    <div class="container">
+        <!-- Stat cards -->
+        <div class="row g-4 mb-5">
+            <div class="col-6 col-lg-3" data-aos="fade-up">
+                <div class="eco-dash-card">
+                    <i class="fa-solid fa-images fa-2x text-amber"></i>
+                    <h2 id="dTotal">—</h2>
+                    <small>Total Scans</small>
+                </div>
+            </div>
+            <div class="col-6 col-lg-3" data-aos="fade-up" data-aos-delay="100">
+                <div class="eco-dash-card">
+                    <i class="fa-solid fa-fire fa-2x text-flame"></i>
+                    <h2 id="dFires">—</h2>
+                    <small>Fire Detected</small>
+                </div>
+            </div>
+            <div class="col-6 col-lg-3" data-aos="fade-up" data-aos-delay="200">
+                <div class="eco-dash-card">
+                    <i class="fa-solid fa-smog fa-2x text-amber"></i>
+                    <h2 id="dSmoke">—</h2>
+                    <small>Smoke Detected</small>
+                </div>
+            </div>
+            <div class="col-6 col-lg-3" data-aos="fade-up" data-aos-delay="300">
+                <div class="eco-dash-card">
+                    <i class="fa-solid fa-shield-halved fa-2x text-leaf"></i>
+                    <h2 id="dSafe">—</h2>
+                    <small>No Fire</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts -->
+        <div class="row g-4 mb-5">
+            <div class="col-md-6" data-aos="fade-right">
+                <div class="eco-chart-card">
+                    <h5><i class="fa-solid fa-chart-bar"></i> Per-Class Recognition Accuracy</h5>
+                    <canvas id="dashAccChart" height="280"></canvas>
+                </div>
+            </div>
+            <div class="col-md-6" data-aos="fade-left">
+                <div class="eco-chart-card">
+                    <h5><i class="fa-solid fa-chart-pie"></i> Detection Distribution</h5>
+                    <canvas id="dashDistChart" height="280"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Timeline + Risk -->
+        <div class="row g-4 mb-5">
+            <div class="col-md-6" data-aos="fade-up">
+                <div class="eco-chart-card">
+                    <h5><i class="fa-solid fa-timeline"></i> Detection Timeline</h5>
+                    <canvas id="timelineChart" height="260"></canvas>
+                </div>
+            </div>
+            <div class="col-md-6" data-aos="fade-up" data-aos-delay="100">
+                <div class="eco-chart-card">
+                    <h5><i class="fa-solid fa-triangle-exclamation"></i> Risk Level Distribution</h5>
+                    <canvas id="riskChart" height="260"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Model Info + Actions -->
+        <div class="row g-4 mb-5">
+            <div class="col-md-6" data-aos="fade-up">
+                <div class="eco-chart-card">
+                    <h5><i class="fa-solid fa-brain"></i> Model Information</h5>
+                    <table class="table table-sm table-dark mt-3">
+                        <tbody>
+                            <tr><td class="text-muted">Architecture</td><td>InceptionV3 (Transfer Learning)</td></tr>
+                            <tr><td class="text-muted">Input Size</td><td>224 × 224 × 3</td></tr>
+                            <tr><td class="text-muted">Classes</td><td>Fire, Smoke, No Fire</td></tr>
+                            <tr><td class="text-muted">Overall Accuracy</td><td><span class="text-success fw-bold" id="tOverall">86.7%</span></td></tr>
+                            <tr><td class="text-muted">Fire Accuracy</td><td><span class="text-flame">96.0%</span></td></tr>
+                            <tr><td class="text-muted">Smoke Accuracy</td><td><span class="text-amber">74.0%</span></td></tr>
+                            <tr><td class="text-muted">No Fire Accuracy</td><td><span class="text-leaf">90.0%</span></td></tr>
+                            <tr><td class="text-muted">Hybrid Layer</td><td>HSV Color Analysis (10% weight)</td></tr>
+                            <tr><td class="text-muted">Training Set</td><td>32,400 images</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="col-md-6" data-aos="fade-up" data-aos-delay="100">
+                <div class="eco-chart-card">
+                    <h5><i class="fa-solid fa-bullseye"></i> Performance Summary</h5>
+                    <div class="row text-center mt-3">
+                        <div class="col-6 mb-3">
+                            <div class="eco-counter-card">
+                                <i class="fa-solid fa-bullseye fa-2x text-amber mb-2"></i>
+                                <h3 id="dAcc">—</h3>
+                                <small>Avg Confidence</small>
+                            </div>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <div class="eco-counter-card">
+                                <i class="fa-solid fa-percent fa-2x text-leaf mb-2"></i>
+                                <h3>86.7%</h3>
+                                <small>Model Accuracy</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-flex gap-2 mt-3">
+                        <a href="{{ url_for('upload_page') }}" class="btn btn-flame btn-sm flex-fill"><i class="fa-solid fa-upload"></i> New Detection</a>
+                        <a href="{{ url_for('history_page') }}" class="btn btn-outline-leaf btn-sm flex-fill"><i class="fa-solid fa-clock-rotate-left"></i> History</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Fire Locations Map -->
+        <div class="row g-4 mb-5">
+            <div class="col-12" data-aos="fade-up">
+                <div class="eco-chart-card">
+                    <h5><i class="fa-solid fa-map-location-dot"></i> Fire Detection Locations</h5>
+                    <p class="small text-muted mb-2">Map showing all detected fire/smoke locations with GPS coordinates</p>
+                    <div id="dashFireMap" class="eco-dashboard-map"></div>
+                    <div class="mt-2 d-flex gap-3">
+                        <small><i class="fa-solid fa-circle text-danger"></i> Fire Detected</small>
+                        <small><i class="fa-solid fa-circle text-warning"></i> Smoke Detected</small>
+                        <small><i class="fa-solid fa-circle text-success"></i> No Fire</small>
+                        <small class="ms-auto text-muted" id="mapLocCount">Loading locations...</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+fetch('/api/stats').then(r=>r.json()).then(d=>{
+    // Animate stat cards
+    animateCountUp(document.getElementById('dTotal'), d.total);
+    animateCountUp(document.getElementById('dFires'), d.fires);
+    animateCountUp(document.getElementById('dSmoke'), d.smoke);
+    animateCountUp(document.getElementById('dSafe'), d.safe);
+    document.getElementById('dAcc').textContent = d.avg_confidence + '%';
+
+    // Per-class accuracy chart (real data)
+    new Chart(document.getElementById('dashAccChart'),{
+        type:'bar',
+        data:{
+            labels:['Fire (96%)','Smoke (74%)','No Fire (90%)','Overall (86.7%)'],
+            datasets:[{label:'Accuracy %',data:[d.accuracy.fire, d.accuracy.smoke, d.accuracy.no_fire, d.accuracy.overall],
+                backgroundColor:['#FF6F00','#FFC107','#2E7D32','#4CAF50'],borderRadius:8}]
+        },
+        options:{responsive:true,
+            scales:{y:{beginAtZero:true,max:100,ticks:{color:'#aaa'},grid:{color:'#222'}},
+                    x:{ticks:{color:'#aaa'},grid:{display:false}}},
+            plugins:{legend:{display:false}}}
+    });
+
+    // Distribution doughnut (3 categories)
+    new Chart(document.getElementById('dashDistChart'),{
+        type:'doughnut',
+        data:{
+            labels:['Fire','Smoke','No Fire'],
+            datasets:[{data:[d.fires, d.smoke, d.safe],
+                backgroundColor:['#FF6F00','#FFC107','#2E7D32'],borderWidth:0}]
+        },
+        options:{responsive:true,plugins:{legend:{position:'bottom',labels:{color:'#ccc'}}}}
+    });
+
+    // Risk chart
+    const riskLabels = Object.keys(d.risk_distribution);
+    const riskValues = Object.values(d.risk_distribution);
+    const riskColors = riskLabels.map(l=>{
+        if(l==='Critical') return '#D32F2F';
+        if(l==='High') return '#F44336';
+        if(l==='Moderate') return '#FF9800';
+        if(l==='Low') return '#4CAF50';
+        return '#2E7D32';
+    });
+    new Chart(document.getElementById('riskChart'),{
+        type:'bar',
+        data:{labels:riskLabels,datasets:[{label:'Count',data:riskValues,backgroundColor:riskColors,borderRadius:6}]},
+        options:{responsive:true,indexAxis:'y',
+            scales:{x:{ticks:{color:'#aaa'},grid:{color:'#222'}},y:{ticks:{color:'#aaa'},grid:{display:false}}},
+            plugins:{legend:{display:false}}}
+    });
+
+    // Timeline chart
+    const dates = Object.keys(d.timeline).sort();
+    if (dates.length) {
+        new Chart(document.getElementById('timelineChart'), {
+            type: 'line',
+            data: {
+                labels: dates,
+                datasets: [
+                    { label: 'Fire', data: dates.map(dt => d.timeline[dt].fire), borderColor: '#FF6F00', backgroundColor: 'rgba(255,111,0,.1)', fill: true, tension: .3 },
+                    { label: 'Smoke', data: dates.map(dt => d.timeline[dt].smoke), borderColor: '#FFC107', backgroundColor: 'rgba(255,193,7,.1)', fill: true, tension: .3 },
+                    { label: 'Safe', data: dates.map(dt => d.timeline[dt].safe), borderColor: '#4CAF50', backgroundColor: 'rgba(76,175,80,.1)', fill: true, tension: .3 }
+                ]
+            },
+            options: {
+                responsive: true,
+                scales: { y: { beginAtZero: true, ticks: { color: '#aaa', stepSize: 1 }, grid: { color: '#222' } }, x: { ticks: { color: '#aaa' }, grid: { display: false } } },
+                plugins: { legend: { position: 'bottom', labels: { color: '#ccc' } } }
+            }
+        });
+    }
+}).catch(()=>{});
+
+// Fire locations map
+fetch('/api/fire-locations').then(r=>r.json()).then(locations=>{
+    const mapEl = document.getElementById('dashFireMap');
+    const countEl = document.getElementById('mapLocCount');
+
+    if (!locations.length) {
+        mapEl.innerHTML = '<div class="text-center py-4 text-muted"><i class="fa-solid fa-map fa-2x mb-2"></i><p>No GPS-tagged detections yet.<br>Enable location access when detecting fire.</p></div>';
+        countEl.textContent = '0 locations';
+        return;
+    }
+
+    const map = L.map('dashFireMap').setView([locations[0].lat, locations[0].lng], 5);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors',
+        maxZoom: 19
+    }).addTo(map);
+
+    const bounds = [];
+    locations.forEach(loc => {
+        let color = '#4CAF50';
+        if (loc.label === 'FIRE DETECTED') color = '#D32F2F';
+        else if (loc.label.includes('Smoke')) color = '#FF9800';
+
+        const icon = L.divIcon({
+            className: 'eco-map-marker',
+            html: `<i class="fa-solid fa-location-dot fa-2x" style="color:${color}"></i>`,
+            iconSize: [24, 36],
+            iconAnchor: [12, 36]
+        });
+
+        L.marker([loc.lat, loc.lng], { icon })
+            .addTo(map)
+            .bindPopup(`<strong>${loc.label}</strong><br>Confidence: ${loc.confidence}%<br>Risk: ${loc.risk_level}<br><small>${loc.timestamp}</small><br><small>${loc.address || ''}</small>`);
+
+        bounds.push([loc.lat, loc.lng]);
+    });
+
+    if (bounds.length > 1) map.fitBounds(bounds, { padding: [30, 30] });
+    countEl.textContent = `${locations.length} location(s) on map`;
+}).catch(()=>{});
+</script>
+{% endblock %}

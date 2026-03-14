@@ -1,0 +1,234 @@
+{% extends "base.html" %}
+{% block title %}Satellite Monitor — Forest Fire Recognition{% endblock %}
+
+{% block content %}
+<section class="py-5">
+    <div class="container">
+        <!-- Header -->
+        <div class="text-center mb-4" data-aos="fade-down">
+            <h2 class="section-heading"><i class="fa-solid fa-satellite"></i> Live Satellite Fire Monitor</h2>
+            <p class="text-muted">Real-time forest fire hotspots detected by NASA VIIRS satellite (updated every few hours)</p>
+        </div>
+
+        <!-- Controls -->
+        <div class="row g-3 mb-4" data-aos="fade-up">
+            <div class="col-md-4">
+                <label class="form-label text-muted small">Region</label>
+                <select id="satCountry" class="form-select eco-select">
+                    <option value="world">Worldwide</option>
+                    <option value="IND">India</option>
+                    <option value="USA">United States</option>
+                    <option value="AUS">Australia</option>
+                    <option value="BRA">Brazil</option>
+                    <option value="CAN">Canada</option>
+                    <option value="RUS">Russia</option>
+                    <option value="IDN">Indonesia</option>
+                    <option value="GRC">Greece</option>
+                    <option value="PRT">Portugal</option>
+                    <option value="ESP">Spain</option>
+                    <option value="TUR">Turkey</option>
+                    <option value="CHN">China</option>
+                    <option value="ZAF">South Africa</option>
+                    <option value="COL">Colombia</option>
+                    <option value="MEX">Mexico</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label text-muted small">Time Range</label>
+                <select id="satDays" class="form-select eco-select" disabled>
+                    <option value="1">Last 24 Hours (Live)</option>
+                </select>
+            </div>
+            <div class="col-md-3 d-flex align-items-end">
+                <button class="btn eco-btn-primary w-100" id="satFetchBtn" onclick="fetchSatelliteFires()">
+                    <i class="fa-solid fa-satellite-dish"></i> Fetch Live Data
+                </button>
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+                <div class="eco-sat-stat-mini text-center w-100">
+                    <div class="text-muted small">Hotspots</div>
+                    <div class="fs-4 fw-bold text-warning" id="satCount">—</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Map -->
+        <div class="eco-card mb-4" data-aos="zoom-in">
+            <div id="satMap" class="sat-map-container"></div>
+            <div class="sat-map-overlay d-none" id="satLoading">
+                <div class="spinner-border text-success" role="status"></div>
+                <div class="mt-2 text-muted">Connecting to NASA FIRMS satellite...</div>
+            </div>
+        </div>
+
+        <!-- Legend + Stats -->
+        <div class="row g-3 mb-4">
+            <div class="col-md-6" data-aos="fade-right">
+                <div class="eco-card p-3">
+                    <h6><i class="fa-solid fa-palette"></i> Fire Intensity Legend</h6>
+                    <div class="d-flex gap-3 flex-wrap mt-2">
+                        <span class="sat-legend-item"><span class="sat-dot" style="background:#FFEB3B"></span> Low FRP (&lt;10 MW)</span>
+                        <span class="sat-legend-item"><span class="sat-dot" style="background:#FF9800"></span> Medium (10–50 MW)</span>
+                        <span class="sat-legend-item"><span class="sat-dot" style="background:#F44336"></span> High (50–100 MW)</span>
+                        <span class="sat-legend-item"><span class="sat-dot" style="background:#B71C1C"></span> Extreme (&gt;100 MW)</span>
+                    </div>
+                    <small class="text-muted mt-2 d-block">FRP = Fire Radiative Power (Megawatts) — measures fire intensity from space</small>
+                </div>
+            </div>
+            <div class="col-md-6" data-aos="fade-left">
+                <div class="eco-card p-3">
+                    <h6><i class="fa-solid fa-chart-pie"></i> Confidence Breakdown</h6>
+                    <div class="row text-center mt-2" id="satConfStats">
+                        <div class="col-4">
+                            <div class="fs-5 fw-bold text-success" id="statHigh">0</div>
+                            <small class="text-muted">High</small>
+                        </div>
+                        <div class="col-4">
+                            <div class="fs-5 fw-bold text-warning" id="statNominal">0</div>
+                            <small class="text-muted">Nominal</small>
+                        </div>
+                        <div class="col-4">
+                            <div class="fs-5 fw-bold text-secondary" id="statLow">0</div>
+                            <small class="text-muted">Low</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Info Section -->
+        <div class="eco-card p-4" data-aos="fade-up">
+            <h5><i class="fa-solid fa-info-circle text-success"></i> How It Works</h5>
+            <div class="row mt-3">
+                <div class="col-md-4 mb-3">
+                    <div class="text-center">
+                        <i class="fa-solid fa-satellite fa-2x text-success mb-2"></i>
+                        <h6>1. Satellite Detection</h6>
+                        <small class="text-muted">NASA's VIIRS sensor aboard the Suomi NPP satellite scans Earth's surface, detecting thermal anomalies (fires) via infrared imaging.</small>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="text-center">
+                        <i class="fa-solid fa-database fa-2x text-warning mb-2"></i>
+                        <h6>2. FIRMS Processing</h6>
+                        <small class="text-muted">NASA's FIRMS system processes raw satellite data within 3 hours, generating fire hotspot coordinates with confidence levels and fire intensity (FRP).</small>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="text-center">
+                        <i class="fa-solid fa-map-location-dot fa-2x text-danger mb-2"></i>
+                        <h6>3. Real-Time Mapping</h6>
+                        <small class="text-muted">Our system pulls this live data and plots each fire hotspot on the map — showing location, intensity, and detection time.</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function() {
+    // Initialize satellite map
+    const satMap = L.map('satMap').setView([20, 0], 2);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap | Fire data: NASA FIRMS',
+        maxZoom: 18
+    }).addTo(satMap);
+
+    let markersGroup = L.layerGroup().addTo(satMap);
+
+    function frpColor(frp) {
+        if (frp > 100) return '#B71C1C';
+        if (frp > 50)  return '#F44336';
+        if (frp > 10)  return '#FF9800';
+        return '#FFEB3B';
+    }
+
+    function frpRadius(frp) {
+        if (frp > 100) return 7;
+        if (frp > 50)  return 5;
+        if (frp > 10)  return 4;
+        return 3;
+    }
+
+    window.fetchSatelliteFires = function() {
+        const country = document.getElementById('satCountry').value;
+        const btn = document.getElementById('satFetchBtn');
+        const loading = document.getElementById('satLoading');
+
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Fetching...';
+        loading.classList.remove('d-none');
+
+        fetch(`/api/satellite-fires?country=${country}`)
+            .then(r => r.json())
+            .then(data => {
+                if (data.error) {
+                    showToast('Satellite connection failed: ' + data.error, 'danger');
+                    return;
+                }
+
+                markersGroup.clearLayers();
+                let high = 0, nominal = 0, low = 0;
+
+                const fires = Array.isArray(data) ? data : (data.fires || []);
+                fires.forEach(f => {
+                    const color = frpColor(f.frp);
+                    const radius = frpRadius(f.frp);
+                    const conf = (f.confidence || '').toString().toLowerCase();
+
+                    if (conf === 'high' || conf === 'h') high++;
+                    else if (conf === 'low' || conf === 'l') low++;
+                    else nominal++;
+
+                    const marker = L.circleMarker([f.lat, f.lng], {
+                        radius: radius,
+                        color: color,
+                        fillColor: color,
+                        fillOpacity: 0.7,
+                        weight: 1
+                    });
+                    marker.bindPopup(
+                        `<div style="min-width:180px">
+                            <strong><i class="fa-solid fa-fire" style="color:${color}"></i> Fire Hotspot</strong><br>
+                            <small><b>Location:</b> ${f.lat.toFixed(4)}, ${f.lng.toFixed(4)}</small><br>
+                            <small><b>Intensity:</b> ${f.frp} MW (FRP)</small><br>
+                            <small><b>Brightness:</b> ${f.brightness} K</small><br>
+                            <small><b>Confidence:</b> ${f.confidence}</small><br>
+                            <small><b>Detected:</b> ${f.date} ${f.time || ''}</small><br>
+                            <small><b>Satellite:</b> ${f.satellite}</small>
+                        </div>`
+                    );
+                    markersGroup.addLayer(marker);
+                });
+
+                document.getElementById('satCount').textContent = fires.length.toLocaleString();
+                document.getElementById('statHigh').textContent = high.toLocaleString();
+                document.getElementById('statNominal').textContent = nominal.toLocaleString();
+                document.getElementById('statLow').textContent = low.toLocaleString();
+
+                // Fit map to data bounds
+                if (fires.length > 0) {
+                    const bounds = L.latLngBounds(fires.map(f => [f.lat, f.lng]));
+                    satMap.fitBounds(bounds, { padding: [30, 30], maxZoom: 6 });
+                }
+
+                showToast(`Loaded ${fires.length.toLocaleString()} satellite fire hotspots`, 'success');
+            })
+            .catch(err => {
+                showToast('Failed to fetch satellite data', 'danger');
+            })
+            .finally(() => {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fa-solid fa-satellite-dish"></i> Fetch Live Data';
+                loading.classList.add('d-none');
+            });
+    };
+
+    // Auto-fetch on page load
+    setTimeout(fetchSatelliteFires, 500);
+})();
+</script>
+{% endblock %}

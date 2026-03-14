@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Smart Forest Fire Detection{% endblock %}</title>
+    <!-- Bootstrap 5.3 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome 6 -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <!-- AOS Animations -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1"></script>
+    <!-- Leaflet.js Maps -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    {% block head %}{% endblock %}
+</head>
+<body>
+    <!-- ─── Navbar ─────────────────────────────────────────── -->
+    <nav class="navbar navbar-expand-lg eco-nav fixed-top">
+        <div class="container">
+            <a class="navbar-brand eco-brand" href="{{ url_for('home') }}">
+                <i class="fa-solid fa-tree"></i> Forest Fire Recognition
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMain">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navMain">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('home') }}"><i class="fa-solid fa-house"></i> Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('about') }}"><i class="fa-solid fa-circle-info"></i> About</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('dataset') }}"><i class="fa-solid fa-database"></i> Dataset</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('upload_page') }}"><i class="fa-solid fa-upload"></i> Detect Fire</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('camera_page') }}"><i class="fa-solid fa-video"></i> Camera</a></li>
+                    <li class="nav-item">
+                        <a class="nav-link position-relative" href="{{ url_for('dashboard_page') }}">
+                            <i class="fa-solid fa-chart-line"></i> Dashboard
+                            <span class="badge bg-danger rounded-pill eco-nav-badge d-none" id="navFireBadge">0</span>
+                        </a>
+                    </li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('history_page') }}"><i class="fa-solid fa-clock-rotate-left"></i> History</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('satellite_page') }}"><i class="fa-solid fa-satellite"></i> Satellite</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('weather_page') }}"><i class="fa-solid fa-cloud-sun"></i> Weather</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('alerts_page') }}"><i class="fa-solid fa-bell"></i> Alerts</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('statistics_page') }}"><i class="fa-solid fa-chart-bar"></i> Statistics</a></li>
+                    <li class="nav-item ms-lg-2">
+                        <button class="btn btn-sm eco-theme-btn" id="themeToggleBtn" title="Toggle Theme">
+                            <i class="fa-solid fa-sun"></i>
+                        </button>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ─── Toast container ───────────────────────────────── -->
+    <div class="toast-container position-fixed bottom-0 end-0 p-3" id="toasts"></div>
+
+    <!-- ─── Main content ──────────────────────────────────── -->
+    <main class="eco-main">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- ─── Footer ────────────────────────────────────────── -->
+    <footer class="eco-footer text-center">
+        <div class="container py-4">
+            <div class="row mb-3">
+                <div class="col-md-4 mb-2">
+                    <h6><i class="fa-solid fa-tree"></i> Forest Fire Recognition</h6>
+                    <small class="text-muted">Protecting Forests Through AI</small>
+                </div>
+                <div class="col-md-4 mb-2">
+                    <h6>Quick Links</h6>
+                    <a href="{{ url_for('upload_page') }}" class="text-muted small d-block">Detect Fire</a>
+                    <a href="{{ url_for('dashboard_page') }}" class="text-muted small d-block">Dashboard</a>
+                </div>
+                <div class="col-md-4 mb-2">
+                    <h6>Technology</h6>
+                    <small class="text-muted">TensorFlow &bull; Flask &bull; OpenCV</small>
+                </div>
+            </div>
+            <hr class="border-secondary">
+            <small class="text-muted">&copy; 2026 Smart Forest Fire Detection System &mdash; Machine Learning Project</small>
+        </div>
+    </footer>
+
+    <!-- ─── Scroll to Top ─────────────────────────────────── -->
+    <button class="eco-scroll-top" id="scrollTopBtn" title="Back to Top">
+        <i class="fa-solid fa-chevron-up"></i>
+    </button>
+
+    <!-- ─── Image Zoom Modal ──────────────────────────────── -->
+    <div class="modal fade" id="imageZoomModal" tabindex="-1">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content bg-transparent border-0">
+                <div class="modal-body p-0 text-center">
+                    <img id="zoomModalImg" class="img-fluid rounded" style="max-height:85vh" alt="Zoomed Image">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ─── Scripts ───────────────────────────────────────── -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script>
+    /* ── Auto-Alert after detection ── */
+    window.EcoAutoAlert = {
+        _LS: 'eco_alert_config',
+        _HIST: 'eco_alert_history',
+        send(detection) {
+            let cfg;
+            try { cfg = JSON.parse(localStorage.getItem(this._LS)) || {}; } catch { return; }
+            if (!cfg.email || !cfg.smtpUser || !cfg.smtpPass) return;
+            const label = (detection.label || '').toUpperCase();
+            const isFire  = label.includes('FIRE');
+            const isSmoke = label.includes('SMOKE');
+            if (isFire && !cfg.onFire) return;
+            if (isSmoke && !cfg.onSmoke) return;
+            if (!isFire && !isSmoke) return;
+            fetch('/api/send-alert', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    email: cfg.email,
+                    smtp_host: cfg.smtpHost || 'smtp.gmail.com',
+                    smtp_port: cfg.smtpPort || 587,
+                    smtp_user: cfg.smtpUser,
+                    smtp_pass: cfg.smtpPass,
+                    detection: detection
+                })
+            })
+            .then(r => r.json())
+            .then(d => {
+                if (d.status === 'sent') {
+                    if (typeof showToast === 'function') showToast('Alert email sent to ' + cfg.email, 'success');
+                    const hist = JSON.parse(localStorage.getItem(this._HIST) || '[]');
+                    hist.unshift({ msg: label + ' alert sent to ' + cfg.email, time: new Date().toLocaleString() });
+                    if (hist.length > 20) hist.length = 20;
+                    localStorage.setItem(this._HIST, JSON.stringify(hist));
+                }
+            })
+            .catch(() => {});
+        }
+    };
+    </script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

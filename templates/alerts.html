@@ -1,0 +1,273 @@
+{% extends "base.html" %}
+{% block title %}Email Alerts — Forest Fire Recognition{% endblock %}
+{% block content %}
+<section class="eco-section">
+  <div class="container">
+    <h2 class="text-center mb-2" data-aos="fade-down">
+      <i class="fa-solid fa-envelope-open-text"></i> Fire Alert Notifications
+    </h2>
+    <p class="text-center text-muted mb-4" data-aos="fade-up">
+      Configure email alerts to receive instant notifications when fire or smoke is detected
+    </p>
+
+    <div class="row justify-content-center" data-aos="fade-up">
+      <div class="col-md-8 col-lg-6">
+        <div class="eco-card p-4">
+          <h5 class="mb-3"><i class="fa-solid fa-gear"></i> Alert Configuration</h5>
+
+          <!-- Email -->
+          <div class="mb-3">
+            <label class="form-label small text-muted">Recipient Email</label>
+            <input type="email" id="alertEmail" class="form-control eco-select"
+                   placeholder="your.email@gmail.com">
+          </div>
+
+          <!-- Trigger Conditions -->
+          <div class="mb-3">
+            <label class="form-label small text-muted">Alert When</label>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="alertOnFire" checked>
+              <label class="form-check-label" for="alertOnFire">
+                <i class="fa-solid fa-fire text-danger"></i> Fire Detected
+              </label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="alertOnSmoke" checked>
+              <label class="form-check-label" for="alertOnSmoke">
+                <i class="fa-solid fa-smog text-warning"></i> Smoke Detected
+              </label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="alertHighFWI">
+              <label class="form-check-label" for="alertHighFWI">
+                <i class="fa-solid fa-temperature-arrow-up text-orange"></i> Fire Weather Index &gt; 60
+              </label>
+            </div>
+          </div>
+
+          <!-- SMTP Settings (collapsible) -->
+          <div class="mb-3">
+            <a class="small text-muted" data-bs-toggle="collapse" href="#smtpSettings" role="button">
+              <i class="fa-solid fa-caret-right"></i> SMTP Settings (Advanced)
+            </a>
+            <div class="collapse mt-2" id="smtpSettings">
+              <div class="mb-2">
+                <label class="form-label small text-muted">SMTP Server</label>
+                <input type="text" id="smtpHost" class="form-control eco-select form-control-sm"
+                       value="smtp.gmail.com">
+              </div>
+              <div class="mb-2">
+                <label class="form-label small text-muted">SMTP Port</label>
+                <input type="number" id="smtpPort" class="form-control eco-select form-control-sm"
+                       value="587">
+              </div>
+              <div class="mb-2">
+                <label class="form-label small text-muted">Sender Email</label>
+                <input type="email" id="smtpUser" class="form-control eco-select form-control-sm"
+                       placeholder="sender@gmail.com">
+              </div>
+              <div class="mb-2">
+                <label class="form-label small text-muted">App Password</label>
+                <input type="password" id="smtpPass" class="form-control eco-select form-control-sm"
+                       placeholder="Gmail App Password">
+              </div>
+              <small class="text-muted">
+                <i class="fa-solid fa-circle-info"></i>
+                For Gmail: Enable 2FA &rarr; create an App Password at
+                <em>myaccount.google.com &rarr; Security &rarr; App passwords</em>
+              </small>
+            </div>
+          </div>
+
+          <!-- Buttons -->
+          <div class="d-flex gap-2">
+            <button class="btn btn-success flex-fill" id="alertSaveBtn">
+              <i class="fa-solid fa-check"></i> Save Configuration
+            </button>
+            <button class="btn btn-outline-success" id="alertTestBtn">
+              <i class="fa-solid fa-paper-plane"></i> Send Test
+            </button>
+          </div>
+
+          <!-- Status -->
+          <div class="mt-3 d-none" id="alertStatus"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Active Alert Status -->
+    <div class="row justify-content-center mt-4" data-aos="fade-up" data-aos-delay="100">
+      <div class="col-md-8 col-lg-6">
+        <div class="eco-card p-3" id="alertCurrentConfig">
+          <h6><i class="fa-solid fa-bell"></i> Current Alert Status</h6>
+          <p class="mb-0 text-muted small" id="alertCurrentText">No alerts configured yet</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Alert History -->
+    <div class="row justify-content-center mt-4" data-aos="fade-up" data-aos-delay="200">
+      <div class="col-md-8 col-lg-6">
+        <div class="eco-card p-3">
+          <h6><i class="fa-solid fa-clock-rotate-left"></i> Recent Alerts Sent</h6>
+          <div id="alertHistoryList">
+            <p class="text-muted small mb-0">No alerts sent yet</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Info -->
+    <div class="row justify-content-center mt-4" data-aos="fade-up" data-aos-delay="300">
+      <div class="col-md-10">
+        <div class="eco-card p-4">
+          <h5><i class="fa-solid fa-circle-question"></i> How Email Alerts Work</h5>
+          <ul class="text-muted small mb-0">
+            <li>Configure your email and SMTP settings above</li>
+            <li>When you upload an image or use camera detection and fire/smoke is found, an email is sent automatically</li>
+            <li>The email includes detection details, confidence level, risk assessment, and location if available</li>
+            <li>Use "Send Test" to verify your email settings work correctly</li>
+            <li>All SMTP credentials are stored locally in your browser — never sent to any third party</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function(){
+  const $ = s => document.querySelector(s);
+  const LS_KEY = 'eco_alert_config';
+
+  function loadConfig() {
+    try { return JSON.parse(localStorage.getItem(LS_KEY)) || {}; } catch { return {}; }
+  }
+  function saveConfig(cfg) { localStorage.setItem(LS_KEY, JSON.stringify(cfg)); }
+
+  // Restore saved config
+  const cfg = loadConfig();
+  if (cfg.email) $('#alertEmail').value = cfg.email;
+  if (cfg.smtpHost) $('#smtpHost').value = cfg.smtpHost;
+  if (cfg.smtpPort) $('#smtpPort').value = cfg.smtpPort;
+  if (cfg.smtpUser) $('#smtpUser').value = cfg.smtpUser;
+  if (cfg.smtpPass) $('#smtpPass').value = cfg.smtpPass;
+  if (cfg.onFire !== undefined) $('#alertOnFire').checked = cfg.onFire;
+  if (cfg.onSmoke !== undefined) $('#alertOnSmoke').checked = cfg.onSmoke;
+  if (cfg.onHighFWI !== undefined) $('#alertHighFWI').checked = cfg.onHighFWI;
+  updateStatusDisplay(cfg);
+
+  function getFormConfig() {
+    return {
+      email: $('#alertEmail').value.trim(),
+      smtpHost: $('#smtpHost').value.trim(),
+      smtpPort: parseInt($('#smtpPort').value) || 587,
+      smtpUser: $('#smtpUser').value.trim(),
+      smtpPass: $('#smtpPass').value,
+      onFire: $('#alertOnFire').checked,
+      onSmoke: $('#alertOnSmoke').checked,
+      onHighFWI: $('#alertHighFWI').checked,
+    };
+  }
+
+  function showStatus(msg, type) {
+    const el = $('#alertStatus');
+    el.className = 'mt-3 alert alert-' + type;
+    el.textContent = msg;
+    el.classList.remove('d-none');
+    setTimeout(() => el.classList.add('d-none'), 5000);
+  }
+
+  function updateStatusDisplay(cfg) {
+    const el = $('#alertCurrentText');
+    if (cfg.email) {
+      const triggers = [];
+      if (cfg.onFire) triggers.push('Fire');
+      if (cfg.onSmoke) triggers.push('Smoke');
+      if (cfg.onHighFWI) triggers.push('High FWI');
+      el.innerHTML = '<i class="fa-solid fa-circle-check text-success"></i> Active — sending to <strong>' +
+        cfg.email + '</strong> on: ' + (triggers.join(', ') || 'None');
+    } else {
+      el.textContent = 'No alerts configured yet';
+    }
+  }
+
+  // Save button
+  $('#alertSaveBtn').addEventListener('click', () => {
+    const c = getFormConfig();
+    if (!c.email) return showStatus('Please enter a recipient email', 'warning');
+    saveConfig(c);
+    updateStatusDisplay(c);
+    showStatus('Alert configuration saved!', 'success');
+  });
+
+  // Test button
+  $('#alertTestBtn').addEventListener('click', () => {
+    const c = getFormConfig();
+    if (!c.email) return showStatus('Please enter a recipient email', 'warning');
+
+    $('#alertTestBtn').disabled = true;
+    $('#alertTestBtn').innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Sending…';
+
+    fetch('/api/send-alert', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        email: c.email,
+        smtp_host: c.smtpHost,
+        smtp_port: c.smtpPort,
+        smtp_user: c.smtpUser,
+        smtp_pass: c.smtpPass,
+        test: true,
+      }),
+    })
+    .then(r => r.json())
+    .then(d => {
+      if (d.status === 'sent') {
+        showStatus('Test email sent successfully to ' + c.email, 'success');
+        addAlertHistory('Test email sent to ' + c.email);
+      } else {
+        showStatus('Failed: ' + (d.error || 'Unknown error'), 'danger');
+      }
+    })
+    .catch(() => showStatus('Network error', 'danger'))
+    .finally(() => {
+      $('#alertTestBtn').disabled = false;
+      $('#alertTestBtn').innerHTML = '<i class="fa-solid fa-paper-plane"></i> Send Test';
+    });
+  });
+
+  // Alert history (stored in localStorage)
+  const HIST_KEY = 'eco_alert_history';
+  function getAlertHistory() {
+    try { return JSON.parse(localStorage.getItem(HIST_KEY)) || []; } catch { return []; }
+  }
+  function addAlertHistory(msg) {
+    const hist = getAlertHistory();
+    hist.unshift({ msg, time: new Date().toLocaleString() });
+    if (hist.length > 20) hist.length = 20;
+    localStorage.setItem(HIST_KEY, JSON.stringify(hist));
+    renderAlertHistory();
+  }
+  function renderAlertHistory() {
+    const hist = getAlertHistory();
+    const el = $('#alertHistoryList');
+    if (!hist.length) {
+      el.innerHTML = '<p class="text-muted small mb-0">No alerts sent yet</p>';
+      return;
+    }
+    el.innerHTML = hist.slice(0, 10).map(h =>
+      '<div class="d-flex justify-content-between small border-bottom py-1">' +
+      '<span>' + h.msg + '</span><span class="text-muted">' + h.time + '</span></div>'
+    ).join('');
+  }
+  renderAlertHistory();
+
+  // Expose for other pages to trigger alerts
+  window.EcoAlertConfig = { loadConfig, getFormConfig };
+})();
+</script>
+{% endblock %}

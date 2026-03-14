@@ -1,0 +1,152 @@
+{% extends "base.html" %}
+{% block title %}History — Forest Fire Recognition{% endblock %}
+
+{% block content %}
+<section class="eco-page-header">
+    <div class="container text-center">
+        <h1 data-aos="fade-down"><i class="fa-solid fa-clock-rotate-left"></i> Prediction History</h1>
+        <p class="text-muted" data-aos="fade-up">View all past detections and download reports</p>
+    </div>
+</section>
+
+<section class="py-5">
+    <div class="container">
+        <!-- Filter bar -->
+        <div class="d-flex flex-wrap gap-2 mb-4" data-aos="fade-up">
+            <button class="btn btn-sm btn-outline-leaf active" data-filter="all">All</button>
+            <button class="btn btn-sm btn-outline-leaf" data-filter="fire">Fire Only</button>
+            <button class="btn btn-sm btn-outline-leaf" data-filter="smoke">Smoke Only</button>
+            <button class="btn btn-sm btn-outline-leaf" data-filter="safe">Safe Only</button>
+            <div class="ms-auto d-flex gap-2">
+                <input type="text" id="searchBox" class="form-control form-control-sm eco-search" placeholder="Search…">
+                <button class="btn btn-sm btn-outline-leaf" id="exportCsvBtn" title="Export CSV">
+                    <i class="fa-solid fa-file-csv"></i>
+                </button>
+                <button class="btn btn-sm btn-outline-leaf text-danger" id="clearAllBtn" title="Clear All History">
+                    <i class="fa-solid fa-trash-can"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Table -->
+        <div class="table-responsive" data-aos="fade-up" data-aos-delay="100">
+            <table class="table table-sm eco-table align-middle">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Date / Time</th>
+                        <th>File</th>
+                        <th>Source</th>
+                        <th>Result</th>
+                        <th>Confidence</th>
+                        <th>Risk</th>
+                        <th>Location</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="historyBody">
+                    <tr><td colspan="8" class="text-center text-muted py-4">Loading…</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="text-center mt-3 text-muted" id="histCount"></div>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let allRecords = [];
+
+async function loadHistory(){
+    const res = await fetch('/api/history');
+    allRecords = await res.json();
+    renderTable(allRecords);
+}
+
+function renderTable(records){
+    const body = document.getElementById('historyBody');
+    if(!records.length){
+        body.innerHTML = '<tr><td colspan="9" class="text-center text-muted py-4">No records yet.</td></tr>';
+        document.getElementById('histCount').textContent = '';
+        return;
+    }
+    body.innerHTML = records.map((r,i) => {
+        const isFire = r.label === 'FIRE DETECTED';
+        const isSmoke = r.detailed_label === 'Smoke';
+        const badgeCls = isFire ? (isSmoke ? 'bg-warning text-dark' : 'bg-danger') : 'bg-success';
+        const badgeText = isSmoke ? '🌫 Smoke' : (isFire ? '🔥 Fire' : '✅ Safe');
+        const riskStyle = `color:${r.risk_color||'#aaa'}`;
+        const loc = r.location || {};
+        const locText = loc.lat ? `<small class="text-truncate d-block" style="max-width:100px" title="${loc.address || ''}"><i class="fa-solid fa-location-dot"></i> ${loc.lat.toFixed(2)}, ${loc.lng.toFixed(2)}</small>` : '<small class="text-muted">—</small>';
+        return `<tr>
+            <td>${i+1}</td>
+            <td class="small">${r.timestamp}</td>
+            <td class="small text-truncate" style="max-width:120px" title="${r.filename}">${r.filename}</td>
+            <td><span class="badge bg-secondary">${r.source||'upload'}</span></td>
+            <td><span class="badge ${badgeCls}">${badgeText}</span></td>
+            <td>
+                <div class="progress eco-progress" style="width:80px;height:6px">
+                    <div class="progress-bar ${isFire?'bg-danger':'bg-success'}" style="width:${r.confidence}%"></div>
+                </div>
+                <small>${r.confidence}%</small>
+            </td>
+            <td style="${riskStyle}">${r.risk_level}</td>
+            <td>${locText}</td>
+            <td>
+                <a href="/result/${r.id}" class="btn btn-outline-leaf btn-sm py-0 px-1" title="View"><i class="fa-solid fa-eye"></i></a>
+                <a href="/download-report/${r.id}" class="btn btn-outline-leaf btn-sm py-0 px-1" title="Download"><i class="fa-solid fa-download"></i></a>
+                <button class="eco-delete-btn" onclick="deleteRecord('${r.id}')" title="Delete"><i class="fa-solid fa-xmark"></i></button>
+            </td>
+        </tr>`;
+    }).join('');
+    document.getElementById('histCount').textContent = `Showing ${records.length} record(s)`;
+}
+
+async function deleteRecord(id) {
+    if (!confirm('Delete this detection record?')) return;
+    try {
+        await fetch(`/api/history/${id}`, { method: 'DELETE' });
+        allRecords = allRecords.filter(r => r.id !== id);
+        renderTable(allRecords);
+        showToast('Record deleted', 'success');
+    } catch(e) { showToast('Failed to delete', 'danger'); }
+}
+
+// Filters
+document.querySelectorAll('[data-filter]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+        document.querySelectorAll('[data-filter]').forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active');
+        const f = btn.dataset.filter;
+        if(f==='fire') renderTable(allRecords.filter(r=>r.label==='FIRE DETECTED' && r.detailed_label==='Fire'));
+        else if(f==='smoke') renderTable(allRecords.filter(r=>r.detailed_label==='Smoke'));
+        else if(f==='safe') renderTable(allRecords.filter(r=>r.label!=='FIRE DETECTED'));
+        else renderTable(allRecords);
+    });
+});
+
+// Search
+document.getElementById('searchBox').addEventListener('input', e=>{
+    const q = e.target.value.toLowerCase();
+    renderTable(allRecords.filter(r=> r.filename.toLowerCase().includes(q) || r.risk_level.toLowerCase().includes(q) || r.detailed_label.toLowerCase().includes(q)));
+});
+
+// Export CSV
+document.getElementById('exportCsvBtn').addEventListener('click', () => exportHistoryCSV(allRecords));
+
+// Clear all
+document.getElementById('clearAllBtn').addEventListener('click', async () => {
+    if (!confirm('Delete ALL detection history? This cannot be undone.')) return;
+    try {
+        await fetch('/api/history', { method: 'DELETE' });
+        allRecords = [];
+        renderTable([]);
+        showToast('History cleared', 'success');
+    } catch(e) { showToast('Failed to clear', 'danger'); }
+});
+
+loadHistory();
+</script>
+{% endblock %}

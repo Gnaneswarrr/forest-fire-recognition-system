@@ -1,0 +1,246 @@
+{% extends "base.html" %}
+{% block title %}Regional Fire Statistics — Forest Fire Recognition{% endblock %}
+{% block content %}
+<section class="eco-section">
+  <div class="container">
+    <h2 class="text-center mb-2" data-aos="fade-down">
+      <i class="fa-solid fa-chart-bar"></i> Regional Fire Statistics
+    </h2>
+    <p class="text-center text-muted mb-4" data-aos="fade-up">
+      Compare active fire hotspots across countries using live NASA satellite data
+    </p>
+
+    <!-- Controls -->
+    <div class="row justify-content-center mb-4" data-aos="fade-up">
+      <div class="col-md-8 col-lg-6 text-center">
+        <button class="btn btn-success" id="statsLoadBtn">
+          <i class="fa-solid fa-satellite-dish"></i> Load Live Statistics
+        </button>
+        <small class="d-block text-muted mt-1">Fetches real-time data from NASA FIRMS for all tracked regions</small>
+      </div>
+    </div>
+
+    <!-- Loading -->
+    <div class="text-center d-none" id="statsLoading">
+      <div class="spinner-border text-success mb-2" role="status"></div>
+      <p class="text-muted">Fetching satellite data for all regions… this may take a moment</p>
+    </div>
+
+    <!-- Error -->
+    <div class="alert alert-danger d-none text-center" id="statsError"></div>
+
+    <!-- Results -->
+    <div class="d-none" id="statsResults">
+      <!-- Summary Cards -->
+      <div class="row g-3 mb-4" data-aos="fade-up">
+        <div class="col-md-3 col-6">
+          <div class="eco-card p-3 text-center h-100">
+            <i class="fa-solid fa-fire fa-2x text-danger mb-2"></i>
+            <h4 id="statsTotalFires" class="mb-0">--</h4>
+            <small class="text-muted">Total Active Fires</small>
+          </div>
+        </div>
+        <div class="col-md-3 col-6">
+          <div class="eco-card p-3 text-center h-100">
+            <i class="fa-solid fa-earth-americas fa-2x text-success mb-2"></i>
+            <h4 id="statsCountries" class="mb-0">--</h4>
+            <small class="text-muted">Countries Tracked</small>
+          </div>
+        </div>
+        <div class="col-md-3 col-6">
+          <div class="eco-card p-3 text-center h-100">
+            <i class="fa-solid fa-bolt fa-2x text-warning mb-2"></i>
+            <h4 id="statsHighConf" class="mb-0">--</h4>
+            <small class="text-muted">High Confidence</small>
+          </div>
+        </div>
+        <div class="col-md-3 col-6">
+          <div class="eco-card p-3 text-center h-100">
+            <i class="fa-solid fa-ranking-star fa-2x text-orange mb-2"></i>
+            <h5 id="statsTopCountry" class="mb-0">--</h5>
+            <small class="text-muted">Most Active Region</small>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bar Chart -->
+      <div class="row g-3 mb-4" data-aos="fade-up" data-aos-delay="100">
+        <div class="col-lg-8">
+          <div class="eco-card p-3 h-100">
+            <h6><i class="fa-solid fa-chart-bar"></i> Fire Hotspots by Country</h6>
+            <canvas id="statsBarChart" height="300"></canvas>
+          </div>
+        </div>
+        <div class="col-lg-4">
+          <div class="eco-card p-3 h-100">
+            <h6><i class="fa-solid fa-chart-pie"></i> Confidence Distribution</h6>
+            <canvas id="statsPieChart" height="300"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Average FRP Chart -->
+      <div class="row g-3 mb-4" data-aos="fade-up" data-aos-delay="150">
+        <div class="col-12">
+          <div class="eco-card p-3">
+            <h6><i class="fa-solid fa-fire-flame-curved"></i> Average Fire Radiative Power (MW) by Country</h6>
+            <canvas id="statsFrpChart" height="200"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Country Table -->
+      <div class="row g-3 mb-4" data-aos="fade-up" data-aos-delay="200">
+        <div class="col-12">
+          <div class="eco-card p-3">
+            <h6><i class="fa-solid fa-table"></i> Detailed Country Breakdown</h6>
+            <div class="table-responsive">
+              <table class="table table-sm mb-0" id="statsTable">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Country</th>
+                    <th>Active Fires</th>
+                    <th>High Confidence</th>
+                    <th>Avg FRP (MW)</th>
+                    <th>Max FRP (MW)</th>
+                    <th>Risk Level</th>
+                  </tr>
+                </thead>
+                <tbody id="statsTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Timestamp -->
+      <div class="text-center text-muted small" data-aos="fade-up" data-aos-delay="250">
+        <i class="fa-solid fa-clock"></i> Data updated: <span id="statsTimestamp">—</span>
+        &bull; Source: NASA FIRMS (VIIRS &amp; MODIS)
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function(){
+  const $ = s => document.querySelector(s);
+  let barChart, pieChart, frpChart;
+
+  const COUNTRY_NAMES = {
+    IND:'India', USA:'United States', AUS:'Australia', BRA:'Brazil',
+    CAN:'Canada', RUS:'Russia', IDN:'Indonesia', GRC:'Greece',
+    PRT:'Portugal', ESP:'Spain', TUR:'Turkey', CHN:'China',
+    ZAF:'South Africa', COL:'Colombia', MEX:'Mexico'
+  };
+
+  $('#statsLoadBtn').addEventListener('click', loadStats);
+
+  async function loadStats() {
+    $('#statsLoading').classList.remove('d-none');
+    $('#statsResults').classList.add('d-none');
+    $('#statsError').classList.add('d-none');
+    $('#statsLoadBtn').disabled = true;
+
+    try {
+      const resp = await fetch('/api/regional-stats');
+      const data = await resp.json();
+      if (data.error) throw new Error(data.error);
+      renderStats(data);
+      $('#statsResults').classList.remove('d-none');
+    } catch(e) {
+      $('#statsError').textContent = 'Failed to load statistics: ' + e.message;
+      $('#statsError').classList.remove('d-none');
+    } finally {
+      $('#statsLoading').classList.add('d-none');
+      $('#statsLoadBtn').disabled = false;
+    }
+  }
+
+  function renderStats(data) {
+    const countries = data.countries;
+    const sorted = Object.entries(countries).sort((a,b) => b[1].count - a[1].count);
+
+    // Summary
+    const totalFires = sorted.reduce((s,c) => s + c[1].count, 0);
+    const totalHighConf = sorted.reduce((s,c) => s + c[1].high_confidence, 0);
+    $('#statsTotalFires').textContent = totalFires.toLocaleString();
+    $('#statsCountries').textContent = sorted.length;
+    $('#statsHighConf').textContent = totalHighConf.toLocaleString();
+    $('#statsTopCountry').textContent = sorted.length ? (COUNTRY_NAMES[sorted[0][0]] || sorted[0][0]) : '--';
+    $('#statsTimestamp').textContent = data.timestamp;
+
+    // Bar chart
+    const labels = sorted.map(c => COUNTRY_NAMES[c[0]] || c[0]);
+    const counts = sorted.map(c => c[1].count);
+    const barColors = counts.map(c => c > 1000 ? '#dc3545' : c > 300 ? '#e67e22' : c > 100 ? '#ffc107' : '#28a745');
+
+    if (barChart) barChart.destroy();
+    barChart = new Chart($('#statsBarChart'), {
+      type: 'bar',
+      data: { labels, datasets: [{ label: 'Active Fires', data: counts, backgroundColor: barColors, borderRadius: 4 }] },
+      options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: {
+          y: { beginAtZero: true, ticks: { color: '#aaa' }, grid: { color: 'rgba(255,255,255,0.05)' } },
+          x: { ticks: { color: '#aaa', maxRotation: 45, minRotation: 30 }, grid: { display: false } }
+        }
+      }
+    });
+
+    // Pie chart — confidence distribution
+    const confHigh = totalHighConf;
+    const confNom = totalFires - totalHighConf;
+    if (pieChart) pieChart.destroy();
+    pieChart = new Chart($('#statsPieChart'), {
+      type: 'doughnut',
+      data: {
+        labels: ['High Confidence', 'Nominal / Low'],
+        datasets: [{ data: [confHigh, confNom], backgroundColor: ['#dc3545', '#ffc107'], borderWidth: 0 }]
+      },
+      options: { responsive: true, plugins: { legend: { position: 'bottom', labels: { color: '#aaa' } } } }
+    });
+
+    // FRP chart
+    const avgFrps = sorted.map(c => c[1].avg_frp);
+    if (frpChart) frpChart.destroy();
+    frpChart = new Chart($('#statsFrpChart'), {
+      type: 'bar',
+      data: {
+        labels,
+        datasets: [{ label: 'Avg FRP (MW)', data: avgFrps, backgroundColor: 'rgba(230,126,34,0.7)', borderRadius: 4 }]
+      },
+      options: {
+        responsive: true,
+        indexAxis: 'y',
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { beginAtZero: true, ticks: { color: '#aaa' }, grid: { color: 'rgba(255,255,255,0.05)' } },
+          y: { ticks: { color: '#aaa' }, grid: { display: false } }
+        }
+      }
+    });
+
+    // Table
+    const tbody = $('#statsTableBody');
+    tbody.innerHTML = sorted.map((c, i) => {
+      const d = c[1];
+      const risk = d.count > 1000 ? '<span class="badge bg-danger">Extreme</span>' :
+                   d.count > 300 ? '<span class="badge" style="background:#e67e22">High</span>' :
+                   d.count > 100 ? '<span class="badge bg-warning text-dark">Moderate</span>' :
+                   '<span class="badge bg-success">Low</span>';
+      return '<tr><td>' + (i+1) + '</td><td>' + (COUNTRY_NAMES[c[0]] || c[0]) +
+             '</td><td>' + d.count.toLocaleString() +
+             '</td><td>' + d.high_confidence.toLocaleString() +
+             '</td><td>' + d.avg_frp.toFixed(1) +
+             '</td><td>' + d.max_frp.toFixed(1) +
+             '</td><td>' + risk + '</td></tr>';
+    }).join('');
+  }
+})();
+</script>
+{% endblock %}

@@ -1,0 +1,160 @@
+{% extends "base.html" %}
+{% block title %}Result — Forest Fire Recognition{% endblock %}
+
+{% block content %}
+<section class="eco-page-header">
+    <div class="container text-center">
+        <h1 data-aos="fade-down"><i class="fa-solid fa-clipboard-check"></i> Detection Result</h1>
+    </div>
+</section>
+
+<section class="py-5">
+    <div class="container">
+        {% if record %}
+        {% set is_fire = record.label == "FIRE DETECTED" %}
+        <div class="row g-5 justify-content-center">
+            <!-- Image -->
+            <div class="col-lg-5 text-center" data-aos="fade-right">
+                <div class="eco-result-img-wrap">
+                    <img src="{{ url_for('static', filename='uploads/' + record.image) }}" class="img-fluid rounded eco-zoomable" alt="Analysed Image">
+                </div>
+                <p class="mt-2 small text-muted">{{ record.filename }} &mdash; {{ record.timestamp }}</p>
+            </div>
+
+            <!-- Details -->
+            <div class="col-lg-5" data-aos="fade-left">
+                <div class="eco-result-card">
+                    <!-- Badge -->
+                    <div class="text-center mb-4">
+                        <span class="eco-result-badge {{ 'badge-fire' if is_fire else 'badge-safe' }} fs-5">
+                            {{ "🔥 " + record.label if is_fire else "✅ " + record.label }}
+                        </span>
+                    </div>
+
+                    <table class="table table-sm table-borderless text-light">
+                        <tr><td class="text-muted">Detection ID</td><td>{{ record.id }}</td></tr>
+                        <tr><td class="text-muted">Detailed Class</td><td>{{ record.detailed_label }}</td></tr>
+                        <tr><td class="text-muted">Confidence</td><td>{{ record.confidence }}%</td></tr>
+                        <tr><td class="text-muted">Risk Level</td><td style="color:{{ record.risk_color }}">{{ record.risk_level }}</td></tr>
+                        <tr><td class="text-muted">Source</td><td>{{ record.source | title }}</td></tr>
+                    </table>
+
+                    <!-- Confidence bar -->
+                    <div class="mb-3">
+                        <label class="form-label small">Overall Confidence</label>
+                        <div class="progress eco-progress">
+                            <div class="progress-bar {{ 'bg-danger' if is_fire else 'bg-success' }}"
+                                 style="width:{{ record.confidence }}%"></div>
+                        </div>
+                    </div>
+
+                    <!-- Probabilities -->
+                    <h6 class="small fw-semibold mt-3">Class Probabilities</h6>
+                    <div class="d-flex justify-content-between"><small>Fire</small><small>{{ record.probabilities.fire }}%</small></div>
+                    <div class="progress eco-progress mb-2"><div class="progress-bar bg-danger" style="width:{{ record.probabilities.fire }}%"></div></div>
+                    <div class="d-flex justify-content-between"><small>Smoke</small><small>{{ record.probabilities.smoke }}%</small></div>
+                    <div class="progress eco-progress mb-2"><div class="progress-bar bg-warning" style="width:{{ record.probabilities.smoke }}%"></div></div>
+                    <div class="d-flex justify-content-between"><small>No Fire</small><small>{{ record.probabilities.no_fire }}%</small></div>
+                    <div class="progress eco-progress mb-3"><div class="progress-bar bg-success" style="width:{{ record.probabilities.no_fire }}%"></div></div>
+
+                    <!-- Recommendation -->
+                    <div class="eco-risk-box" style="border-left-color:{{ record.risk_color }}">
+                        <strong style="color:{{ record.risk_color }}">⚠ {{ record.risk_level }}</strong>
+                        <p class="mb-0 small">{{ record.recommendation }}</p>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="d-flex gap-2 mt-4">
+                        <a href="{{ url_for('download_report', record_id=record.id) }}" class="btn btn-outline-leaf btn-sm flex-fill">
+                            <i class="fa-solid fa-file-arrow-down"></i> Download Report
+                        </a>
+                        <a href="{{ url_for('upload_page') }}" class="btn btn-flame btn-sm flex-fill">
+                            <i class="fa-solid fa-rotate"></i> New Detection
+                        </a>
+                    </div>
+
+                    <!-- Alarm control (fire only) -->
+                    {% if is_fire %}
+                    <div class="mt-3 text-center" id="resultAlarmPanel">
+                        <button class="btn btn-sm btn-danger eco-alarm-btn" id="resultAlarmToggle">
+                            <i class="fa-solid fa-volume-high fa-beat-fade"></i> Stop Alarm
+                        </button>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Location Map (full-width row below) -->
+            {% if record.location and record.location.lat %}
+            <div class="col-lg-10 mt-4" data-aos="fade-up">
+                <div class="eco-result-card">
+                    <h5><i class="fa-solid fa-map-location-dot"></i> Fire Detection Location</h5>
+                    <div id="resultMap" class="eco-location-map"></div>
+                    <div class="mt-2">
+                        <small class="text-muted"><i class="fa-solid fa-location-dot"></i>
+                            {{ record.location.address or "Lat: %.4f, Lng: %.4f"|format(record.location.lat, record.location.lng) }}
+                        </small>
+                        <br>
+                        <small class="text-muted">
+                            Coordinates: {{ "%.6f"|format(record.location.lat) }}, {{ "%.6f"|format(record.location.lng) }}
+                        </small>
+                    </div>
+                </div>
+            </div>
+            {% endif }
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+            <i class="fa-solid fa-circle-exclamation fa-3x text-muted mb-3"></i>
+            <p>Record not found. <a href="{{ url_for('upload_page') }}">Try a new detection</a>.</p>
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // Initialize image zoom
+    initImageZoom();
+
+    {% if record %}
+    // Initialize location map
+    {% if record.location and record.location.lat %}
+    createLocationMap('resultMap', {{ record.location.lat }}, {{ record.location.lng }}, '{{ record.label }}');
+    {% endif %}
+
+    // Auto-send email alert
+    EcoAutoAlert.send({
+        label: '{{ record.label }}',
+        detailed_label: '{{ record.detailed_label }}',
+        confidence: {{ record.confidence }},
+        risk_level: '{{ record.risk_level }}',
+        recommendation: '{{ record.recommendation }}',
+        timestamp: '{{ record.timestamp }}',
+        location: {{ record.location | tojson }}
+    });
+
+    // Fire alarm auto-play
+    {% if is_fire %}
+    EcoAlarm.play();
+    const toggle = document.getElementById('resultAlarmToggle');
+    if (toggle) {
+        toggle.onclick = () => {
+            if (EcoAlarm.isPlaying()) {
+                EcoAlarm.stop();
+                toggle.innerHTML = '<i class="fa-solid fa-volume-xmark"></i> Alarm Off';
+                toggle.classList.replace('btn-danger','btn-secondary');
+            } else {
+                EcoAlarm.play();
+                toggle.innerHTML = '<i class="fa-solid fa-volume-high fa-beat-fade"></i> Stop Alarm';
+                toggle.classList.replace('btn-secondary','btn-danger');
+            }
+        };
+    }
+    {% endif %}
+    {% endif %}
+});
+</script>
+{% endblock %}

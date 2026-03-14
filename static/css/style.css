@@ -1,0 +1,653 @@
+/* ═══════════════════════════════════════════════════════
+   Forest Fire Recognition — ML-Powered Fire & Smoke Detection
+   Complete Design System
+   ═══════════════════════════════════════════════════════ */
+
+/* ── Tokens ──────────────────────────────────────────── */
+:root {
+    --eco-dark:   #0B1A0E;
+    --eco-darker: #071209;
+    --eco-card:   #12261A;
+    --eco-border: #1E3A28;
+    --eco-leaf:   #2E7D32;
+    --eco-leaf-l: #4CAF50;
+    --eco-amber:  #F9A825;
+    --eco-flame:  #FF6F00;
+    --eco-fire:   #D32F2F;
+    --eco-text:   #E0E0E0;
+    --eco-muted:  #8DA898;
+    --eco-radius: 14px;
+    --eco-shadow: 0 4px 24px rgba(0,0,0,.35);
+    --font-heading: 'Poppins', sans-serif;
+    --font-body:    'Inter', sans-serif;
+}
+
+/* ── Base ────────────────────────────────────────────── */
+body {
+    background: var(--eco-darker);
+    color: var(--eco-text);
+    font-family: var(--font-body);
+    overflow-x: hidden;
+}
+
+h1,h2,h3,h4,h5,h6,.eco-brand { font-family: var(--font-heading); }
+a { color: var(--eco-leaf-l); text-decoration: none; }
+a:hover { color: var(--eco-amber); }
+.text-leaf  { color: var(--eco-leaf-l) !important; }
+.text-flame { color: var(--eco-flame) !important; }
+.text-amber { color: var(--eco-amber) !important; }
+
+/* ── Navbar ──────────────────────────────────────────── */
+.eco-nav {
+    background: rgba(11,26,14,.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--eco-border);
+    padding: .6rem 0;
+    transition: background .3s;
+}
+.eco-brand {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: var(--eco-leaf-l) !important;
+    letter-spacing: .5px;
+}
+.eco-brand i { color: var(--eco-amber); }
+.eco-nav .nav-link {
+    color: var(--eco-muted);
+    font-size: .82rem;
+    padding: .35rem .55rem;
+    border-radius: 8px;
+    transition: all .25s;
+    white-space: nowrap;
+}
+.eco-nav .nav-link:hover,
+.eco-nav .nav-link.active {
+    color: #fff;
+    background: rgba(46,125,50,.2);
+}
+
+/* ── Hero ────────────────────────────────────────────── */
+.eco-hero {
+    min-height: 92vh;
+    background:
+        linear-gradient(160deg, rgba(11,26,14,.88) 0%, rgba(7,18,9,.7) 100%),
+        url('https://images.unsplash.com/photo-1542273917363-3b1817f69a2d?w=1600') center/cover no-repeat;
+    position: relative;
+}
+.eco-hero-overlay {
+    position: absolute; inset:0;
+    background: radial-gradient(ellipse at 30% 80%, rgba(46,125,50,.15) 0%, transparent 60%);
+}
+.eco-hero-title {
+    font-size: 3.2rem;
+    font-weight: 700;
+    color: #fff;
+    text-shadow: 0 2px 20px rgba(0,0,0,.5);
+}
+.eco-hero-title i { color: var(--eco-amber); }
+.eco-hero-sub {
+    font-size: 1.2rem;
+    color: var(--eco-muted);
+    max-width: 620px;
+    margin: .8rem auto 0;
+}
+
+/* ── Buttons ─────────────────────────────────────────── */
+.btn-flame {
+    background: linear-gradient(135deg, var(--eco-flame), var(--eco-fire));
+    color: #fff; border: none;
+    border-radius: 30px;
+    padding: .55rem 1.6rem;
+    font-weight: 600;
+    box-shadow: 0 4px 16px rgba(255,111,0,.3);
+    transition: transform .2s, box-shadow .2s;
+}
+.btn-flame:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 24px rgba(255,111,0,.45);
+    color: #fff;
+}
+.btn-leaf {
+    background: linear-gradient(135deg, var(--eco-leaf), var(--eco-leaf-l));
+    color: #fff; border: none;
+    border-radius: 30px;
+    padding: .55rem 1.6rem;
+    font-weight: 600;
+    transition: transform .2s;
+}
+.btn-leaf:hover { transform: translateY(-2px); color: #fff; }
+.btn-outline-leaf {
+    border: 1.5px solid var(--eco-leaf);
+    color: var(--eco-leaf-l);
+    border-radius: 30px;
+    padding: .45rem 1.4rem;
+    font-weight: 500;
+    transition: all .25s;
+}
+.btn-outline-leaf:hover,
+.btn-outline-leaf.active {
+    background: var(--eco-leaf);
+    color: #fff;
+}
+
+/* ── Section utilities ───────────────────────────────── */
+.eco-main { padding-top: 68px; }
+.eco-section-alt { background: var(--eco-dark); }
+.section-heading {
+    font-weight: 700;
+    color: #fff;
+}
+.section-heading i { color: var(--eco-amber); margin-right: .35rem; }
+
+.eco-page-header {
+    padding: 5rem 0 2.5rem;
+    background: linear-gradient(180deg, var(--eco-dark), var(--eco-darker));
+}
+.eco-page-header h1 { font-weight: 700; color: #fff; }
+.eco-page-header h1 i { color: var(--eco-amber); }
+
+/* ── Cards ───────────────────────────────────────────── */
+.eco-feature-card,
+.eco-stat-card,
+.eco-ml-card,
+.eco-tech-card,
+.eco-step-card,
+.eco-dash-card,
+.eco-chart-card,
+.eco-upload-card,
+.eco-result-card,
+.eco-camera-card,
+.eco-info-card,
+.eco-counter-card {
+    background: var(--eco-card);
+    border: 1px solid var(--eco-border);
+    border-radius: var(--eco-radius);
+    padding: 1.5rem;
+    box-shadow: var(--eco-shadow);
+    transition: transform .25s, border-color .25s;
+}
+.eco-feature-card:hover,
+.eco-ml-card:hover,
+.eco-tech-card:hover,
+.eco-step-card:hover { transform: translateY(-5px); border-color: var(--eco-leaf); }
+
+.eco-feature-card h5,
+.eco-ml-card h5 { color: #fff; margin-top: .6rem; }
+.eco-feature-card p { color: var(--eco-muted); font-size: .9rem; }
+.eco-feature-icon {
+    width: 52px; height: 52px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 12px;
+    background: rgba(46,125,50,.15);
+    font-size: 1.3rem;
+    color: var(--eco-leaf-l);
+}
+.eco-ml-icon {
+    width: 56px; height: 56px; margin: 0 auto .8rem;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 50%;
+    font-size: 1.5rem;
+    background: rgba(249,168,37,.1);
+    color: var(--eco-amber);
+}
+
+/* Step cards */
+.eco-step-card { text-align: center; position: relative; }
+.eco-step-num {
+    display: inline-block;
+    width: 32px; height: 32px;
+    line-height: 32px;
+    border-radius: 50%;
+    background: var(--eco-leaf);
+    color: #fff;
+    font-weight: 700;
+    font-size: .85rem;
+    margin-bottom: .5rem;
+}
+.eco-step-icon { font-size: 1.5rem; color: var(--eco-amber); display: block; margin-bottom: .5rem; }
+
+/* Counter / Dash cards */
+.eco-counter-card h3,
+.eco-dash-card h2 { color: #fff; font-weight: 700; }
+.eco-dash-card { text-align: center; }
+.eco-dash-card small { color: var(--eco-muted); }
+
+/* ── Tech badge ──────────────────────────────────────── */
+.eco-tech-badge {
+    background: rgba(46,125,50,.18);
+    color: var(--eco-leaf-l);
+    border: 1px solid var(--eco-border);
+    border-radius: 20px;
+    padding: .4rem 1rem;
+    font-size: .82rem;
+    font-weight: 500;
+}
+
+/* ── Upload / Drop zone ──────────────────────────────── */
+.eco-drop-zone {
+    border: 2px dashed var(--eco-border);
+    border-radius: var(--eco-radius);
+    padding: 2.5rem 1rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all .3s;
+    background: rgba(18,38,26,.5);
+}
+.eco-drop-zone:hover,
+.eco-drop-zone.active {
+    border-color: var(--eco-leaf-l);
+    background: rgba(46,125,50,.08);
+}
+.eco-preview-img { max-height: 250px; border: 2px solid var(--eco-border); border-radius: 10px; }
+
+/* ── Result badge ────────────────────────────────────── */
+.eco-result-badge {
+    display: inline-block;
+    padding: .6rem 1.8rem;
+    border-radius: 30px;
+    font-weight: 700;
+    font-size: 1.05rem;
+    letter-spacing: .5px;
+}
+.badge-fire {
+    background: linear-gradient(135deg, var(--eco-flame), var(--eco-fire));
+    color: #fff;
+    animation: firePulse 1.8s infinite;
+}
+.badge-safe {
+    background: linear-gradient(135deg, var(--eco-leaf), var(--eco-leaf-l));
+    color: #fff;
+}
+@keyframes firePulse {
+    0%,100% { box-shadow: 0 0 0 0 rgba(255,111,0,.4); }
+    50%     { box-shadow: 0 0 0 12px rgba(255,111,0,0); }
+}
+
+/* ── Progress bars ───────────────────────────────────── */
+.eco-progress {
+    height: 8px;
+    background: rgba(255,255,255,.08);
+    border-radius: 4px;
+}
+
+/* ── Risk box ────────────────────────────────────────── */
+.eco-risk-box {
+    border-left: 4px solid var(--eco-amber);
+    padding: .75rem 1rem;
+    background: rgba(249,168,37,.06);
+    border-radius: 0 8px 8px 0;
+}
+
+/* ── Info cards with colored borders ─────────────────── */
+.eco-info-card.border-flame { border-left: 4px solid var(--eco-flame); }
+.eco-info-card.border-leaf  { border-left: 4px solid var(--eco-leaf-l); }
+.eco-check-list { list-style: none; padding-left: 0; }
+.eco-check-list li { padding: .3rem 0; }
+.eco-check-list li i { width: 20px; text-align: center; margin-right: .4rem; }
+
+/* ── Pipeline (about page) ───────────────────────────── */
+.eco-pipeline {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: .5rem;
+}
+.eco-pipe-step {
+    display: flex; flex-direction: column; align-items: center;
+    padding: .8rem 1rem;
+    background: var(--eco-card);
+    border: 1px solid var(--eco-border);
+    border-radius: 10px;
+    font-size: .8rem;
+    min-width: 90px;
+    transition: transform .2s;
+}
+.eco-pipe-step i { font-size: 1.2rem; color: var(--eco-leaf-l); margin-bottom: .3rem; }
+.eco-pipe-step.highlight { border-color: var(--eco-flame); }
+.eco-pipe-step.highlight i { color: var(--eco-flame); }
+.eco-pipe-arrow { color: var(--eco-muted); font-size: .9rem; }
+
+/* ── Camera ──────────────────────────────────────────── */
+.eco-camera-viewport {
+    background: #000;
+    border-radius: var(--eco-radius);
+    overflow: hidden;
+    min-height: 340px;
+    display: flex; align-items: center; justify-content: center;
+}
+.eco-camera-viewport img { width: 100%; height: auto; }
+.eco-cam-placeholder {
+    text-align: center;
+    color: var(--eco-muted);
+    padding: 2rem;
+}
+
+/* ── Spinner ─────────────────────────────────────────── */
+.eco-spinner {
+    width: 48px; height: 48px;
+    border: 4px solid var(--eco-border);
+    border-top-color: var(--eco-leaf-l);
+    border-radius: 50%;
+    animation: spin .8s linear infinite;
+    margin: 0 auto;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Result image wrapper ────────────────────────────── */
+.eco-result-img-wrap {
+    border: 3px solid var(--eco-border);
+    border-radius: var(--eco-radius);
+    overflow: hidden;
+}
+
+/* ── Table ───────────────────────────────────────────── */
+.eco-table {
+    color: var(--eco-text);
+    border-color: var(--eco-border);
+}
+.eco-table thead th {
+    background: var(--eco-card);
+    border-bottom: 2px solid var(--eco-leaf);
+    font-size: .82rem;
+    text-transform: uppercase;
+    color: var(--eco-muted);
+}
+.eco-table tbody tr {
+    border-color: var(--eco-border);
+    transition: background .2s;
+}
+.eco-table tbody tr:hover { background: rgba(46,125,50,.06); }
+
+/* ── Search ──────────────────────────────────────────── */
+.eco-search {
+    background: var(--eco-card);
+    border: 1px solid var(--eco-border);
+    color: #fff;
+    border-radius: 20px;
+    width: 200px;
+}
+.eco-search:focus { border-color: var(--eco-leaf); box-shadow: 0 0 0 3px rgba(46,125,50,.2); }
+
+/* ── Footer ──────────────────────────────────────────── */
+.eco-footer {
+    background: var(--eco-dark);
+    border-top: 1px solid var(--eco-border);
+}
+.eco-footer h6 { color: #fff; }
+
+/* ── Toast override ──────────────────────────────────── */
+.eco-toast {
+    background: var(--eco-card);
+    border: 1px solid var(--eco-border);
+    border-radius: 10px;
+    color: var(--eco-text);
+}
+
+/* ── Location Maps ───────────────────────────────────── */
+.eco-mini-map {
+    height: 180px;
+    border-radius: var(--eco-radius);
+    border: 1px solid var(--eco-border);
+    z-index: 1;
+}
+
+.eco-location-map {
+    height: 320px;
+    border-radius: var(--eco-radius);
+    border: 1px solid var(--eco-border);
+    z-index: 1;
+}
+
+.eco-dashboard-map {
+    height: 400px;
+    border-radius: var(--eco-radius);
+    border: 1px solid var(--eco-border);
+    z-index: 1;
+}
+
+.eco-map-marker {
+    background: none !important;
+    border: none !important;
+}
+
+/* ── Fire Alarm Button ───────────────────────────────── */
+.eco-alarm-btn {
+    animation: alarmPulse 1s infinite;
+}
+
+.eco-alarm-btn.btn-secondary {
+    animation: none;
+}
+
+@keyframes alarmPulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(211, 47, 47, 0.6); }
+    50% { box-shadow: 0 0 16px 4px rgba(211, 47, 47, 0.4); }
+}
+
+/* ── Animations ──────────────────────────────────────── */
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Responsive ──────────────────────────────────────── */
+@media (max-width: 768px) {
+    .eco-hero-title { font-size: 2rem; }
+    .eco-hero-sub   { font-size: 1rem; }
+    .eco-pipeline   { gap: .3rem; }
+    .eco-pipe-step  { min-width: 70px; padding: .5rem; font-size: .7rem; }
+    .eco-pipe-arrow { font-size: .7rem; }
+    .eco-drop-zone  { padding: 1.5rem .5rem; }
+}
+
+/* ── Theme Toggle Button ─────────────────────────────── */
+.eco-theme-btn {
+    background: rgba(46,125,50,.15);
+    border: 1px solid var(--eco-border);
+    color: var(--eco-amber);
+    border-radius: 50%;
+    width: 36px; height: 36px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: .95rem;
+    transition: all .3s;
+    padding: 0;
+}
+.eco-theme-btn:hover {
+    background: var(--eco-leaf);
+    color: #fff;
+    transform: rotate(180deg);
+}
+
+/* ── Scroll-to-Top Button ────────────────────────────── */
+.eco-scroll-top {
+    position: fixed;
+    bottom: 2rem; right: 2rem;
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--eco-leaf), var(--eco-leaf-l));
+    color: #fff;
+    border: none;
+    font-size: 1rem;
+    box-shadow: 0 4px 16px rgba(46,125,50,.4);
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(20px);
+    transition: all .35s;
+    z-index: 1040;
+    cursor: pointer;
+}
+.eco-scroll-top.visible {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+.eco-scroll-top:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 24px rgba(46,125,50,.55);
+}
+
+/* ── Navbar Notification Badge ───────────────────────── */
+.eco-nav-badge {
+    position: absolute;
+    top: 2px; right: -2px;
+    font-size: .62rem;
+    padding: .15rem .4rem;
+    min-width: 18px;
+    animation: badgePop .4s ease-out;
+}
+@keyframes badgePop {
+    0%   { transform: scale(0); }
+    60%  { transform: scale(1.3); }
+    100% { transform: scale(1); }
+}
+
+/* ── Stepped Loading ─────────────────────────────────── */
+.eco-step-loader {
+    text-align: center;
+    padding: 1rem 0;
+}
+.step-loader-steps {
+    text-align: left;
+    max-width: 220px;
+    margin: .8rem auto 0;
+}
+.step-item {
+    padding: .25rem 0;
+    opacity: .4;
+    transition: opacity .3s;
+}
+.step-item.active { opacity: 1; font-weight: 500; }
+.step-item.done { opacity: .7; }
+
+/* ── Image Zoom ──────────────────────────────────────── */
+.eco-zoomable {
+    cursor: zoom-in;
+    transition: transform .2s;
+}
+.eco-zoomable:hover {
+    transform: scale(1.02);
+}
+#imageZoomModal .modal-dialog { max-width: 90vw; }
+
+/* ── History Action Buttons ──────────────────────────── */
+.eco-delete-btn {
+    color: var(--eco-fire);
+    background: none;
+    border: none;
+    padding: .1rem .3rem;
+    font-size: .8rem;
+    cursor: pointer;
+    opacity: .6;
+    transition: all .2s;
+}
+.eco-delete-btn:hover { opacity: 1; transform: scale(1.2); }
+
+/* ── Light Mode Overrides ────────────────────────────── */
+body.light-mode {
+    --eco-dark:   #F5F5F0;
+    --eco-darker: #FAFAF5;
+    --eco-card:   #FFFFFF;
+    --eco-border: #D4E6D6;
+    --eco-text:   #2C3E2C;
+    --eco-muted:  #5A7A5A;
+    --eco-shadow: 0 4px 24px rgba(0,0,0,.08);
+    background: var(--eco-darker);
+    color: var(--eco-text);
+}
+body.light-mode .eco-nav {
+    background: rgba(245,245,240,.95);
+    border-bottom-color: var(--eco-border);
+}
+body.light-mode .eco-brand { color: var(--eco-leaf) !important; }
+body.light-mode .eco-nav .nav-link { color: #4a6a4a; }
+body.light-mode .eco-nav .nav-link:hover,
+body.light-mode .eco-nav .nav-link.active { color: var(--eco-leaf); background: rgba(46,125,50,.08); }
+body.light-mode .eco-hero {
+    background:
+        linear-gradient(160deg, rgba(245,245,240,.85) 0%, rgba(250,250,245,.7) 100%),
+        url('https://images.unsplash.com/photo-1542273917363-3b1817f69a2d?w=1600') center/cover no-repeat;
+}
+body.light-mode .eco-hero-title { color: #1a3a1a; text-shadow: none; }
+body.light-mode .eco-hero-sub { color: #5a7a5a; }
+body.light-mode .section-heading { color: #1a3a1a; }
+body.light-mode .eco-feature-card h5,
+body.light-mode .eco-ml-card h5,
+body.light-mode .eco-counter-card h3,
+body.light-mode .eco-dash-card h2 { color: #1a3a1a; }
+body.light-mode .eco-footer { background: #EAF0EA; border-top-color: var(--eco-border); }
+body.light-mode .eco-footer h6 { color: #1a3a1a; }
+body.light-mode .eco-table thead th { background: #f0f5f0; color: #5a7a5a; }
+body.light-mode .eco-table { color: var(--eco-text); }
+body.light-mode .eco-search { background: #fff; color: #333; }
+body.light-mode .eco-theme-btn { background: rgba(46,125,50,.08); }
+body.light-mode .modal-content { background: #fff !important; }
+
+/* ── Satellite Monitor ─────────────────────────────── */
+.sat-map-container {
+    width: 100%; height: 520px;
+    border-radius: 12px; overflow: hidden;
+    border: 1px solid var(--eco-border);
+    position: relative;
+}
+.sat-map-overlay {
+    position: absolute; inset: 0; z-index: 999;
+    background: rgba(10,18,10,.8);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    border-radius: 12px;
+}
+.sat-legend-item {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: .85rem; color: var(--eco-text);
+}
+.sat-dot {
+    width: 12px; height: 12px; border-radius: 50%;
+    display: inline-block; border: 1px solid rgba(255,255,255,.2);
+}
+.eco-sat-stat-mini {
+    background: var(--eco-card); border-radius: 10px;
+    padding: 8px; border: 1px solid var(--eco-border);
+}
+.eco-select {
+    background: var(--eco-card); color: var(--eco-text);
+    border: 1px solid var(--eco-border); border-radius: 8px;
+}
+body.light-mode .eco-select { background: #fff; color: #333; border-color: #d0d0d0; }
+body.light-mode .sat-map-container { border-color: #d0d0d0; }
+body.light-mode .eco-sat-stat-mini { background: #fff; border-color: #d0d0d0; }
+body.light-mode .sat-legend-item { color: #333; }
+
+/* ── Weather & FWI ─────────────────────────────────────── */
+.wx-fwi-badge {
+    display: inline-block; font-size: 2.5rem; font-weight: 700;
+    width: 90px; height: 90px; line-height: 90px;
+    border-radius: 50%; text-align: center;
+    background: var(--eco-card); border: 3px solid var(--eco-accent);
+    color: var(--eco-text);
+}
+.wx-fwi-low { border-color: #28a745; color: #28a745; }
+.wx-fwi-moderate { border-color: #ffc107; color: #ffc107; }
+.wx-fwi-high { border-color: #e67e22; color: #e67e22; }
+.wx-fwi-very-high { border-color: #dc3545; color: #dc3545; }
+.wx-fwi-extreme { border-color: #8b0000; color: #8b0000; }
+.wx-gauge-container { padding: 0 10px; }
+.wx-gauge-track {
+    height: 12px; border-radius: 6px;
+    background: linear-gradient(90deg, #28a745 0%, #ffc107 30%, #e67e22 55%, #dc3545 75%, #8b0000 100%);
+    opacity: 0.3; position: relative;
+}
+.wx-gauge-fill {
+    height: 100%; border-radius: 6px;
+    background: #28a745; transition: width 0.8s ease;
+    position: absolute; top: 0; left: 0;
+}
+.text-orange { color: #e67e22 !important; }
+.wx-factor-chip {
+    background: var(--eco-card); border: 1px solid var(--eco-border);
+    border-radius: 8px; padding: 6px 10px; text-align: center;
+}
+.wx-factor-chip span { display: block; font-weight: 600; font-size: 1.1rem; }
+body.light-mode .wx-fwi-badge { background: #fff; }
+body.light-mode .wx-factor-chip { background: #fff; border-color: #d0d0d0; }

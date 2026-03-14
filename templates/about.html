@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+{% block title %}About — Forest Fire Recognition{% endblock %}
+
+{% block content %}
+<section class="eco-page-header">
+    <div class="container text-center">
+        <h1 data-aos="fade-down"><i class="fa-solid fa-circle-info"></i> About the Project</h1>
+        <p class="text-muted" data-aos="fade-up">Understanding the forest fire crisis and how AI helps protect our woodlands</p>
+    </div>
+</section>
+
+<!-- Problem -->
+<section class="py-5">
+    <div class="container">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-6" data-aos="fade-right">
+                <div class="eco-info-card border-flame">
+                    <h3 class="text-flame"><i class="fa-solid fa-fire"></i> The Forest Fire Crisis</h3>
+                    <p>Every year, millions of hectares of forest are destroyed by wildfires, devastating entire ecosystems:</p>
+                    <ul class="eco-check-list">
+                        <li><i class="fa-solid fa-xmark text-danger"></i> Destruction of forest canopy, undergrowth &amp; old-growth trees</li>
+                        <li><i class="fa-solid fa-xmark text-danger"></i> Loss of wildlife habitats — animals, birds &amp; insects displaced or killed</li>
+                        <li><i class="fa-solid fa-xmark text-danger"></i> Soil erosion &amp; watershed damage after forest cover is burned</li>
+                        <li><i class="fa-solid fa-xmark text-danger"></i> Release of stored carbon, accelerating climate change</li>
+                        <li><i class="fa-solid fa-xmark text-danger"></i> Threat to forest-dependent indigenous communities</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-lg-6" data-aos="fade-left">
+                <div class="eco-info-card border-leaf">
+                    <h3 class="text-leaf"><i class="fa-solid fa-seedling"></i> Why Early Detection Matters</h3>
+                    <p>Most forest fires start small — a single spark in dry undergrowth. Early recognition saves entire ecosystems.</p>
+                    <ul class="eco-check-list">
+                        <li><i class="fa-solid fa-check text-success"></i> Forest rangers can respond in minutes instead of hours</li>
+                        <li><i class="fa-solid fa-check text-success"></i> Preserves tree canopy, root systems &amp; forest floor biodiversity</li>
+                        <li><i class="fa-solid fa-check text-success"></i> Protects wildlife corridors &amp; nesting habitats</li>
+                        <li><i class="fa-solid fa-check text-success"></i> Prevents fire from spreading to neighboring forest zones</li>
+                        <li><i class="fa-solid fa-check text-success"></i> Enables evacuation of forest workers &amp; nearby communities</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ML Approach -->
+<section class="eco-section-alt py-5">
+    <div class="container">
+        <h2 class="section-heading text-center mb-5" data-aos="fade-up">
+            <i class="fa-solid fa-robot"></i> How ML Recognizes Forest Fire
+        </h2>
+        <div class="row g-4">
+            <div class="col-md-4" data-aos="fade-up">
+                <div class="eco-ml-card">
+                    <div class="eco-ml-icon"><i class="fa-solid fa-brain"></i></div>
+                    <h5>CNN (InceptionV3)</h5>
+                    <span class="badge bg-success mb-2">Primary Model</span>
+                    <p>Deep CNN pre-trained on ImageNet, fine-tuned on 32,000+ real forest fire, smoke &amp; woodland images. Achieves <strong>86.7% accuracy</strong> across three classes.</p>
+                </div>
+            </div>
+            <div class="col-md-4" data-aos="fade-up" data-aos-delay="100">
+                <div class="eco-ml-card">
+                    <div class="eco-ml-icon"><i class="fa-solid fa-vector-square"></i></div>
+                    <h5>Color Analysis (HSV)</h5>
+                    <span class="badge bg-warning text-dark mb-2">Hybrid Layer</span>
+                    <p>HSV color-space analysis detects fire-orange &amp; smoke-grey tones typical of forest burn areas. Provides secondary verification.</p>
+                </div>
+            </div>
+            <div class="col-md-4" data-aos="fade-up" data-aos-delay="200">
+                <div class="eco-ml-card">
+                    <div class="eco-ml-icon"><i class="fa-solid fa-tree"></i></div>
+                    <h5>Hybrid Decision Engine</h5>
+                    <span class="badge bg-info mb-2">Fusion</span>
+                    <p>Combines CNN confidence (90% weight) with color analysis evidence to make robust forest fire recognition decisions.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Pipeline -->
+<section class="py-5">
+    <div class="container text-center">
+        <h2 class="section-heading mb-5" data-aos="fade-up"><i class="fa-solid fa-diagram-project"></i> Detection Pipeline</h2>
+        <div class="eco-pipeline" data-aos="fade-up" data-aos-delay="100">
+            <div class="eco-pipe-step"><i class="fa-solid fa-image"></i><span>Input Image</span></div>
+            <div class="eco-pipe-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+            <div class="eco-pipe-step"><i class="fa-solid fa-crop-simple"></i><span>Resize 224×224</span></div>
+            <div class="eco-pipe-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+            <div class="eco-pipe-step"><i class="fa-solid fa-wand-magic-sparkles"></i><span>Denoise</span></div>
+            <div class="eco-pipe-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+            <div class="eco-pipe-step"><i class="fa-solid fa-sliders"></i><span>Normalize</span></div>
+            <div class="eco-pipe-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+            <div class="eco-pipe-step"><i class="fa-solid fa-microchip"></i><span>CNN Model</span></div>
+            <div class="eco-pipe-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+            <div class="eco-pipe-step highlight"><i class="fa-solid fa-fire-flame-curved"></i><span>Result</span></div>
+        </div>
+    </div>
+</section>
+
+<!-- Tech -->
+<section class="eco-section-alt py-5">
+    <div class="container text-center">
+        <h2 class="section-heading mb-4" data-aos="fade-up"><i class="fa-solid fa-code"></i> Technology Stack</h2>
+        <div class="row g-4 justify-content-center">
+            {% set techs = [
+                ("fa-brands fa-python", "Python 3", "Core language"),
+                ("fa-solid fa-flask", "Flask", "Web framework"),
+                ("fa-solid fa-brain", "TensorFlow / Keras", "Deep learning"),
+                ("fa-solid fa-eye", "OpenCV", "Image processing"),
+                ("fa-solid fa-chart-column", "Scikit-learn", "Classical ML"),
+                ("fa-brands fa-bootstrap", "Bootstrap 5", "Responsive UI"),
+                ("fa-solid fa-chart-pie", "Chart.js", "Visualizations"),
+                ("fa-brands fa-js", "JavaScript", "Interactivity")
+            ] %}
+            {% for icon, name, desc in techs %}
+            <div class="col-6 col-md-3" data-aos="zoom-in" data-aos-delay="{{ loop.index0 * 60 }}">
+                <div class="eco-tech-card">
+                    <i class="{{ icon }} fa-2x mb-2"></i>
+                    <h6>{{ name }}</h6>
+                    <small class="text-muted">{{ desc }}</small>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}

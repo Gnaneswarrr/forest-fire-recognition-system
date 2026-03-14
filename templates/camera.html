@@ -1,0 +1,222 @@
+{% extends "base.html" %}
+{% block title %}Live Camera — Forest Fire Recognition{% endblock %}
+
+{% block content %}
+<section class="eco-page-header">
+    <div class="container text-center">
+        <h1 data-aos="fade-down"><i class="fa-solid fa-video"></i> Real-Time Camera Detection</h1>
+        <p class="text-muted" data-aos="fade-up">Point your camera at the forest area to recognize fire or smoke in real time</p>
+    </div>
+</section>
+
+<section class="py-5">
+    <div class="container">
+        <div class="row g-5 justify-content-center">
+            <!-- Camera feed -->
+            <div class="col-lg-7" data-aos="fade-right">
+                <div class="eco-camera-card">
+                    <div class="eco-camera-viewport" id="viewport">
+                        <img id="camFeed" class="d-none" alt="Camera Feed">
+                        <div id="camPlaceholder" class="eco-cam-placeholder">
+                            <i class="fa-solid fa-video-slash fa-3x mb-3"></i>
+                            <p>Camera is off. Click <strong>Start Camera</strong> to begin.</p>
+                        </div>
+                    </div>
+                    <div class="d-flex gap-2 mt-3">
+                        <button class="btn btn-leaf flex-fill" id="btnStart">
+                            <i class="fa-solid fa-play"></i> Start Camera
+                        </button>
+                        <button class="btn btn-outline-leaf flex-fill" id="btnStop" disabled>
+                            <i class="fa-solid fa-stop"></i> Stop
+                        </button>
+                        <button class="btn btn-flame flex-fill" id="btnCapture" disabled>
+                            <i class="fa-solid fa-camera"></i> Capture &amp; Detect
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Camera result panel -->
+            <div class="col-lg-5" data-aos="fade-left">
+                <div class="eco-result-card" id="camResultCard">
+                    <h5><i class="fa-solid fa-clipboard-check"></i> Capture Result</h5>
+
+                    <div id="camLoading" class="text-center py-4 d-none">
+                        <div class="eco-spinner"></div>
+                        <p class="mt-2 small">Analysing frame…</p>
+                    </div>
+
+                    <div id="camResult" class="d-none">
+                        <div class="text-center mb-3">
+                            <span class="eco-result-badge" id="camBadge"></span>
+                        </div>
+                        <div id="camDetails"></div>
+                        <div class="mb-3">
+                            <label class="form-label small">Confidence</label>
+                            <div class="progress eco-progress">
+                                <div class="progress-bar" id="camConfBar" style="width:0%"></div>
+                            </div>
+                            <small id="camConfText">0%</small>
+                        </div>
+                        <div class="eco-risk-box" id="camRiskBox">
+                            <strong id="camRisk"></strong>
+                            <p class="mb-0 small" id="camRec"></p>
+                        </div>
+                        <div class="d-flex gap-2 mt-3">
+                            <a id="camReportLink" class="btn btn-outline-leaf btn-sm flex-fill" href="#"><i class="fa-solid fa-download"></i> Report</a>
+                            <a id="camFullLink" class="btn btn-outline-leaf btn-sm flex-fill" href="#"><i class="fa-solid fa-expand"></i> Details</a>
+                        </div>
+
+                        <!-- Alarm control -->
+                        <div id="camAlarmPanel" class="d-none mt-3 text-center">
+                            <button class="btn btn-sm btn-danger eco-alarm-btn" id="camAlarmToggle">
+                                <i class="fa-solid fa-volume-high fa-beat-fade"></i> Stop Alarm
+                            </button>
+                        </div>
+
+                        <!-- Location map -->
+                        <div id="camMapWrap" class="d-none mt-3">
+                            <h6 class="small fw-semibold"><i class="fa-solid fa-location-dot"></i> Detection Location</h6>
+                            <div id="camMap" class="eco-mini-map"></div>
+                            <small class="text-muted" id="camAddress"></small>
+                        </div>
+                    </div>
+
+                    <div id="camEmpty">
+                        <div class="text-center py-4 text-muted">
+                            <i class="fa-solid fa-camera-retro fa-2x mb-2"></i>
+                            <p class="small">Capture a frame to see detection results here.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Guidelines -->
+                <div class="eco-info-card border-leaf mt-4">
+                    <h6><i class="fa-solid fa-lightbulb"></i> Tips</h6>
+                    <ul class="small mb-0">
+                        <li>Ensure good lighting for best results</li>
+                        <li>Point the camera at the scene you want to analyse</li>
+                        <li>Click <strong>Capture &amp; Detect</strong> to analyse the current frame</li>
+                        <li>Each capture is saved to your detection history</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const btnStart   = document.getElementById('btnStart');
+const btnStop    = document.getElementById('btnStop');
+const btnCapture = document.getElementById('btnCapture');
+const camFeed    = document.getElementById('camFeed');
+const placeholder= document.getElementById('camPlaceholder');
+
+btnStart.addEventListener('click', async ()=>{
+    await fetch('/camera/start',{method:'POST'});
+    camFeed.src = '/camera/feed?' + Date.now();
+    camFeed.classList.remove('d-none');
+    placeholder.classList.add('d-none');
+    btnStart.disabled = true; btnStop.disabled = false; btnCapture.disabled = false;
+});
+
+btnStop.addEventListener('click', async ()=>{
+    await fetch('/camera/stop',{method:'POST'});
+    camFeed.classList.add('d-none');
+    placeholder.classList.remove('d-none');
+    btnStart.disabled = false; btnStop.disabled = true; btnCapture.disabled = true;
+});
+
+btnCapture.addEventListener('click', async ()=>{
+    document.getElementById('camLoading').classList.remove('d-none');
+    document.getElementById('camResult').classList.add('d-none');
+    document.getElementById('camEmpty').classList.add('d-none');
+
+    // Build request body with geolocation
+    const bodyObj = EcoGeo.toParams();
+
+    try {
+        const res = await fetch('/camera/capture',{
+            method:'POST',
+            headers:{'Content-Type':'application/json'},
+            body: JSON.stringify(bodyObj)
+        });
+        const d = await res.json();
+        if(d.error){ showToast(d.error,'danger'); return; }
+        const isFire = d.label === 'FIRE DETECTED';
+
+        document.getElementById('camBadge').textContent = d.label;
+        document.getElementById('camBadge').className = 'eco-result-badge '+(isFire?'badge-fire':'badge-safe');
+
+        document.getElementById('camDetails').innerHTML =
+            `<div class="row text-center mb-3"><div class="col-6"><small class="text-muted">Class</small><br><strong>${d.detailed_label}</strong></div><div class="col-6"><small class="text-muted">Confidence</small><br><strong>${d.confidence}%</strong></div></div>`;
+
+        const bar = document.getElementById('camConfBar');
+        bar.style.width = d.confidence+'%';
+        bar.className = 'progress-bar '+(isFire?'bg-danger':'bg-success');
+        document.getElementById('camConfText').textContent = d.confidence+'%';
+
+        const rb = document.getElementById('camRiskBox');
+        rb.style.borderLeftColor = d.risk_color;
+        document.getElementById('camRisk').textContent = '⚠ '+d.risk_level;
+        document.getElementById('camRisk').style.color = d.risk_color;
+        document.getElementById('camRec').textContent = d.recommendation;
+
+        document.getElementById('camReportLink').href = '/download-report/'+d.id;
+        document.getElementById('camFullLink').href = '/result/'+d.id;
+
+        document.getElementById('camResult').classList.remove('d-none');
+
+        // Auto-send email alert
+        EcoAutoAlert.send({
+            label: d.label,
+            detailed_label: d.detailed_label,
+            confidence: d.confidence,
+            risk_level: d.risk_level,
+            recommendation: d.recommendation,
+            timestamp: new Date().toLocaleString(),
+            location: d.location || {}
+        });
+
+        // Fire alarm
+        const camAlarmPanel = document.getElementById('camAlarmPanel');
+        if (isFire) {
+            EcoAlarm.play();
+            camAlarmPanel.classList.remove('d-none');
+            document.getElementById('camAlarmToggle').onclick = () => {
+                if (EcoAlarm.isPlaying()) {
+                    EcoAlarm.stop();
+                    document.getElementById('camAlarmToggle').innerHTML = '<i class="fa-solid fa-volume-xmark"></i> Alarm Off';
+                    document.getElementById('camAlarmToggle').classList.replace('btn-danger','btn-secondary');
+                } else {
+                    EcoAlarm.play();
+                    document.getElementById('camAlarmToggle').innerHTML = '<i class="fa-solid fa-volume-high fa-beat-fade"></i> Stop Alarm';
+                    document.getElementById('camAlarmToggle').classList.replace('btn-secondary','btn-danger');
+                }
+            };
+        } else {
+            camAlarmPanel.classList.add('d-none');
+            EcoAlarm.stop();
+        }
+
+        // Location map
+        const camMapWrap = document.getElementById('camMapWrap');
+        const loc = d.location || {};
+        if (loc.lat && loc.lng) {
+            camMapWrap.classList.remove('d-none');
+            document.getElementById('camAddress').textContent = loc.address || `${loc.lat.toFixed(4)}, ${loc.lng.toFixed(4)}`;
+            setTimeout(() => createLocationMap('camMap', loc.lat, loc.lng, d.label), 200);
+        } else if (EcoGeo.ready) {
+            camMapWrap.classList.remove('d-none');
+            document.getElementById('camAddress').textContent = EcoGeo.address;
+            setTimeout(() => createLocationMap('camMap', EcoGeo.lat, EcoGeo.lng, d.label), 200);
+        } else {
+            camMapWrap.classList.add('d-none');
+        }
+    } catch(e){ showToast('Capture failed','danger'); }
+    finally { document.getElementById('camLoading').classList.add('d-none'); }
+});
+</script>
+{% endblock %}
